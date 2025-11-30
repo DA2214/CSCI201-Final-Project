@@ -184,11 +184,6 @@ function updateView() {
 // Buttons & Initialization
 // ======================
 
-function handleEraseRequest() {
-  document.getElementById("eraseMessage").textContent =
-    "Data erasure request sent to server (not implemented in demo).";
-}
-
 function handleLogout() {
   window.location.href = "login.html";
 }
@@ -196,7 +191,6 @@ function handleLogout() {
 document.addEventListener("DOMContentLoaded", async () => {
 	console.log("Doing JS");
   document.getElementById("timeRange").addEventListener("change", updateView);
-  document.getElementById("eraseDataBtn").addEventListener("click", handleEraseRequest);
   document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
   // 🌟 Fetch real data from your servlet
