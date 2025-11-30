@@ -16,7 +16,7 @@ CREATE TABLE users (
 --------------------------------------------------
 -- 2. MACHINE TABLE
 --------------------------------------------------
-CREATE TABLE machine (
+CREATE TABLE machines (
     machineID VARCHAR(50) PRIMARY KEY,
     machineName VARCHAR(100) NOT NULL
 );
@@ -32,13 +32,13 @@ CREATE TABLE machineusage (
     date DATE NOT NULL,
 
     FOREIGN KEY (userID) REFERENCES users(uid),
-    FOREIGN KEY (machineID) REFERENCES machine(machineID)
+    FOREIGN KEY (machineID) REFERENCES machines(machineID)
 );
 
 --------------------------------------------------
 -- 4. RESERVATION TABLE
 --------------------------------------------------
-CREATE TABLE reservation (
+CREATE TABLE reservations (
     reservationId INT AUTO_INCREMENT PRIMARY KEY,
     userID INT NOT NULL,
     machineID VARCHAR(50) NOT NULL,
@@ -48,5 +48,5 @@ CREATE TABLE reservation (
     date DATE NOT NULL,
 
     FOREIGN KEY (userID) REFERENCES users(uid),
-    FOREIGN KEY (machineID) REFERENCES machine(machineID)
+    FOREIGN KEY (machineID) REFERENCES machines(machineID)
 );

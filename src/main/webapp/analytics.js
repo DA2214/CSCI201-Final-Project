@@ -1,66 +1,53 @@
-// Simulated "logged in" user data for frontend-only demo.
-// In the real app, this would be fetched from the server using userID.
+// ======================
+// Fetch data from server
+// ======================
 
-const mockUsageData = [
-  // usageID, userID, machineID, duration (minutes), date
-  { usageID: 1, userID: 101, machineID: "TREAD_1", machineName: "Treadmill 1", duration: 30, date: "2025-11-24" },
-  { usageID: 2, userID: 101, machineID: "TREAD_2", machineName: "Treadmill 2", duration: 45, date: "2025-11-22" },
-  { usageID: 3, userID: 101, machineID: "BIKE_1",  machineName: "Bike 1",      duration: 20, date: "2025-11-20" },
-  { usageID: 4, userID: 101, machineID: "BENCH_1", machineName: "Bench Press 1", duration: 40, date: "2025-11-18" },
-  { usageID: 5, userID: 101, machineID: "TREAD_1", machineName: "Treadmill 1", duration: 60, date: "2025-11-10" }
-];
+// You must set this from login/session
+const LOGGED_IN_USER_ID = 101;
 
-const mockReservationData = [
-  // reservationId, userID, machineID, machineName, startTime, endTime, status, date
-  {
-    reservationId: 11,
-    userID: 101,
-    machineID: "TREAD_1",
-    machineName: "Treadmill 1",
-    startTime: "08:00",
-    endTime: "09:00",
-    status: "Completed",
-    date: "2025-11-24"
-  },
-  {
-    reservationId: 12,
-    userID: 101,
-    machineID: "BIKE_1",
-    machineName: "Bike 1",
-    startTime: "18:00",
-    endTime: "19:00",
-    status: "Cancelled",
-    date: "2025-11-21"
-  },
-  {
-    reservationId: 13,
-    userID: 101,
-    machineID: "BENCH_1",
-    machineName: "Bench Press 1",
-    startTime: "16:00",
-    endTime: "17:00",
-    status: "Completed",
-    date: "2025-11-18"
+async function fetchUserHistory() {
+  try {
+    const response = await fetch(`AnalyticsServlet?userID=${LOGGED_IN_USER_ID}`);
+
+    if (!response.ok) {
+      throw new Error("Server returned " + response.status);
+    }
+
+    const data = await response.json();
+
+	console.log(data);
+	
+    // Expecting: { machineUsage: [...], reservations: [...] }
+    return {
+      usage: data.machineUsage || [],
+      reservations: data.reservations || []
+    };
+
+  } catch (err) {
+    console.error("Error fetching user history:", err);
+    return { usage: [], reservations: [] };
   }
-];
+}
 
-// Utility: parse YYYY-MM-DD into Date at local midnight
+// ======================
+// Date helpers
+// ======================
+
 function parseDate(dateStr) {
   const [y, m, d] = dateStr.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 
-// Return records in last N days; if "all", no filtering.
 function filterByRange(data, days) {
   if (days === "all") return data.slice();
 
   const now = new Date();
   const cutoff = new Date(now);
   cutoff.setDate(now.getDate() - Number(days));
+
   return data.filter((item) => parseDate(item.date) >= cutoff);
 }
 
-// Compute total minutes for last 7 days / 30 days
 function computeTotals(usageData) {
   const now = new Date();
   const weekCutoff = new Date(now);
@@ -74,37 +61,38 @@ function computeTotals(usageData) {
 
   usageData.forEach((u) => {
     const d = parseDate(u.date);
-    if (d >= weekCutoff) {
-      weekly += u.duration;
-    }
-    if (d >= monthCutoff) {
-      monthly += u.duration;
-    }
+    if (d >= weekCutoff) weekly += u.duration;
+    if (d >= monthCutoff) monthly += u.duration;
   });
 
   return { weekly, monthly };
 }
 
-// Compute most used machine name based on total duration
 function computeTopMachine(usageData) {
   if (!usageData.length) return "–";
-  const totalsByMachine = {};
+  const totals = {};
+
   usageData.forEach((u) => {
-    const key = u.machineName;
-    totalsByMachine[key] = (totalsByMachine[key] || 0) + u.duration;
+    totals[u.machineName] = (totals[u.machineName] || 0) + u.duration;
   });
+
   let bestName = "–";
   let bestMinutes = 0;
-  for (const [name, minutes] of Object.entries(totalsByMachine)) {
+
+  for (const [name, minutes] of Object.entries(totals)) {
     if (minutes > bestMinutes) {
       bestMinutes = minutes;
       bestName = name;
     }
   }
+
   return bestName;
 }
 
-// Render functions
+// ======================
+// Rendering functions
+// ======================
+
 function renderSummary(usageData) {
   const { weekly, monthly } = computeTotals(usageData);
   document.getElementById("weeklyMinutes").textContent = `${weekly} min`;
@@ -121,12 +109,15 @@ function renderUsageTable(usageData) {
     emptyMsg.style.display = "block";
     return;
   }
+
   emptyMsg.style.display = "none";
 
-  // Sort newest first
-  const sorted = usageData.slice().sort((a, b) => parseDate(b.date) - parseDate(a.date));
+  const sorted = usageData
+    .slice()
+    .sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
   sorted.forEach((u) => {
+	console.log(u);
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${u.date}</td>
@@ -146,6 +137,7 @@ function renderReservationTable(reservationData) {
     emptyMsg.style.display = "block";
     return;
   }
+
   emptyMsg.style.display = "none";
 
   const sorted = reservationData
@@ -153,6 +145,7 @@ function renderReservationTable(reservationData) {
     .sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
   sorted.forEach((r) => {
+	console.log(r);
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.date}</td>
@@ -165,45 +158,50 @@ function renderReservationTable(reservationData) {
   });
 }
 
-// Apply filter based on dropdown
+// ======================
+// Update UI based on dropdown
+// ======================
+
+let serverUsage = [];
+let serverReservations = [];
+
 function updateView() {
-  const rangeSelect = document.getElementById("timeRange");
-  const days = rangeSelect.value;
+  const days = document.getElementById("timeRange").value;
 
-  const filteredUsage = filterByRange(mockUsageData, days);
-  const filteredReservations = filterByRange(mockReservationData, days);
+  console.log(days);
+  console.log(serverUsage);
+  const filteredUsage = filterByRange(serverUsage, days);
+  console.log(serverReservations);
+  const filteredReservations = filterByRange(serverReservations, days);
 
-  renderSummary(mockUsageData); // summary is always based on real recent usage
+  console.log
+  renderSummary(serverUsage); // summary always uses full usage
   renderUsageTable(filteredUsage);
   renderReservationTable(filteredReservations);
 }
 
-// Handle data erase request (frontend-only)
+// ======================
+// Buttons & Initialization
+// ======================
+
 function handleEraseRequest() {
-  const msg = document.getElementById("eraseMessage");
-  msg.textContent =
-    "Data erasure request submitted. In the real system, this would notify the server to remove your Usage and Reservation records.";
+  document.getElementById("eraseMessage").textContent =
+    "Data erasure request sent to server (not implemented in demo).";
 }
 
-// Handle logout button (frontend-only)
 function handleLogout() {
-  // In real app: clear auth token / session and redirect
   window.location.href = "login.html";
 }
 
-// Init
-document.addEventListener("DOMContentLoaded", () => {
-  document
-    .getElementById("timeRange")
-    .addEventListener("change", updateView);
+document.addEventListener("DOMContentLoaded", async () => {
+	console.log("Doing JS");
+  document.getElementById("timeRange").addEventListener("change", updateView);
+  document.getElementById("eraseDataBtn").addEventListener("click", handleEraseRequest);
+  document.getElementById("logoutBtn").addEventListener("click", handleLogout);
 
-  document
-    .getElementById("eraseDataBtn")
-    .addEventListener("click", handleEraseRequest);
-
-  document
-    .getElementById("logoutBtn")
-    .addEventListener("click", handleLogout);
-
+  // 🌟 Fetch real data from your servlet
+  const data = await fetchUserHistory();
+  serverUsage = data.usage;
+  serverReservations = data.reservations;
   updateView();
 });
