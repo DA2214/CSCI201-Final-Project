@@ -1,0 +1,121 @@
+:root {
+  --usc-red: #990000;
+  --usc-gold: #ffd700;
+  --bg-light: #faf7f3;
+  --text-dark: #222;
+  --radius: 10px;
+  --shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+/* Body: match reservation page background and font */
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--bg-light, #faf7f3), #ffffff);
+}
+
+/* Top nav consistent with reservation/analytics, but simpler */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #990000; /* var(--usc-red) if you defined it */
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  font-weight: bold;
+  letter-spacing: 0.03em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+/* Auth button on top right */
+.nav-auth-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* Make auth card centered below navbar */
+.main-auth-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+/* Auth card matches .reservation-card */
+.auth-box {
+  background: #fff;
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Heading color matches reservation titles */
+.auth-box h1 {
+  margin-bottom: 1rem;
+  color: var(--usc-red);
+}
+
+/* Inputs styled like form controls */
+.auth-box input {
+  width: 100%;
+  padding: 0.6rem;
+  margin: 0.6rem 0;
+  border-radius: var(--radius);
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+/* Primary button like reservation buttons */
+.auth-box button {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.8rem;
+  background-color: var(--usc-red);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.auth-box button:hover {
+  background-color: #7d0000;
+}
+
+/* Switch text below form */
+.switch {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Error styling consistent with message emphasis */
+.error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 0.8rem;
+  font-weight: 600;
+}

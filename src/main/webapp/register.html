@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<header class="top-nav">
+	  <div class="logo">USC Village GymSync</div>
+	  <div class="nav-links">
+	    <button type="button" class="nav-auth-btn" onclick="window.location.href='login.html'">
+	      Login / Register
+	    </button>
+	  </div>
+	</header>
+	<main class="main-auth-container">
+    <div class="auth-box">
+        <h1>Create Account</h1>
+
+        <input id="reg-username" type="text" placeholder="Username">
+        <input id="reg-email" type="text" placeholder="Email">
+        <input id="reg-password" type="password" placeholder="Password">
+        <input id="reg-confirm" type="password" placeholder="Confirm Password">
+
+        <button onclick="registerUser()">Register</button>
+
+        <p class="switch">
+            Already have an account? <a href="login.html">Sign in</a>
+        </p>
+
+        <p id="register-error" class="error"></p>
+    </div>
+</main>
+<script src="register.js"></script>
+</body>
+</html>

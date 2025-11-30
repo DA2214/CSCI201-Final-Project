@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Fitness Analytics</title>
+  <link rel="stylesheet" href="analytics.css" />
+</head>
+<body>
+  <!-- Top navigation shared look with reservation page -->
+  <nav class="top-nav">
+    <div class="logo">USC Village GymSync</div>
+    <div class="nav-links">
+      <a href="reservation.html">Reservations</a>
+      <a href="analytics.html" class="active">My Analytics</a>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <main class="analytics-container">
+    <!-- Left column: summary cards -->
+    <section class="summary-panel">
+      <h1>My Fitness Analytics</h1>
+      <p class="subtitle">Overview of your personal gym activity</p>
+
+      <div class="summary-cards">
+        <div class="summary-card">
+          <h2>Total Time (This Week)</h2>
+          <p class="summary-value" id="weeklyMinutes">0 min</p>
+        </div>
+        <div class="summary-card">
+          <h2>Total Time (This Month)</h2>
+          <p class="summary-value" id="monthlyMinutes">0 min</p>
+        </div>
+        <div class="summary-card">
+          <h2>Most Used Machine</h2>
+          <p class="summary-value" id="topMachine">–</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label for="timeRange">Show history for:</label>
+        <select id="timeRange">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="all">All time</option>
+        </select>
+      </div>
+
+      <div class="consent-box">
+        <h2>Data Privacy</h2>
+        <p>
+          Your personal analytics are based on your machine usage and reservations.
+          You may request to have your data erased at any time.
+        </p>
+        <button id="eraseDataBtn" class="danger-btn">
+          Request Data Erasure
+        </button>
+        <p id="eraseMessage" class="info-message"></p>
+      </div>
+    </section>
+
+    <!-- Right column: detailed tables -->
+    <section class="details-panel">
+      <div class="panel-card">
+        <h2>Usage History</h2>
+        <table id="usageTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Machine</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+        <p id="usageEmpty" class="empty-msg">No usage history in this range.</p>
+      </div>
+
+      <div class="panel-card">
+        <h2>Reservation History</h2>
+        <table id="reservationTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Machine</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+        <p id="reservationEmpty" class="empty-msg">No reservations in this range.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="analytics.js"></script>
+    <footer>
+    © 2025 USC GymSync | Team 17 · CSCI-201 · Marco Papa
+  </footer>
+</body>
+  
+</body>
+</html>

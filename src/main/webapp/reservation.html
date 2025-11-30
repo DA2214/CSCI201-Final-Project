@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservations</title>
+  <link rel="stylesheet" href="reservation.css">
+</head>
+<body>
+	  <nav class="top-nav">
+	  <div class="logo">USC Village GymSync</div>
+	  <div class="nav-links">
+	    <a href="reservation.html" class="active">Reservations</a>
+	    <a href="analytics.html">My Analytics</a>
+	    <button id="logoutBtn" type="button">Logout</button>
+	  </div>
+	</nav>
+
+
+  <main>
+    <section class="reservation-card">
+      <h2>Reserve a Machine</h2>
+      <p class="subtitle">Select a machine, choose your duration, and confirm your booking.</p>
+
+      <form id="reservationForm">
+        <!-- Machine Selector -->
+        <div class="form-group">
+          <label for="machine">Select Machine:</label>
+          <select id="machine" required>
+            <option value="">-- Select --</option>
+            <option value="Treadmill 1">Treadmill 1</option>
+            <option value="Bench Press 1">Bench Press 1</option>
+            <option value="Bike 1">Bike 1</option>
+            <option value="Elliptical 1">Elliptical 1</option>
+            <option value="Lat Pulldown">Lat Pulldown</option>
+            <option value="Leg Press">Leg Press</option>
+          </select>
+        </div>
+
+        <!-- Duration -->
+        <div class="form-group">
+          <label for="duration">Select Duration:</label>
+          <select id="duration" required>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60" selected>1 hour</option>
+            <option value="90">1 hour 30 minutes</option>
+            <option value="120">2 hours</option>
+          </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-row">
+          <button type="submit" id="reserveBtn">Reserve Machine</button>
+          <button type="button" id="waitlistBtn" class="secondary">Join Waitlist</button>
+        </div>
+      </form>
+
+      <div id="message" class="message"></div>
+    </section>
+
+    <!-- Table -->
+    <section class="reservations-table">
+      <h3>My Reservations</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Machine</th>
+            <th>Duration</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="reservationHistory">
+          <tr>
+            <td>Treadmill 2</td>
+            <td>60 minutes</td>
+            <td class="confirmed">Confirmed</td>
+          </tr>
+          <tr>
+            <td>Bench 1</td>
+            <td>30 minutes</td>
+            <td class="waitlisted">Waitlisted</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 USC GymSync | Team 17 · CSCI-201 · Marco Papa</p>
+  </footer>
+
+  <script src="reservation.js"></script>
+</body>
+</html>
