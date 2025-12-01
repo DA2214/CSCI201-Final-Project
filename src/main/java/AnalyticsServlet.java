@@ -1,3 +1,5 @@
+package main.java;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -12,10 +14,6 @@ import com.google.gson.GsonBuilder;
 
 @WebServlet("/AnalyticsServlet")
 public class AnalyticsServlet extends HttpServlet {
-
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/TrojanTracker";
-    private static final String JDBC_USER = "root";   // change if needed
-    private static final String JDBC_PASS = "root";   // change if needed
 
     // ---------- POJO CLASSES ----------
     class MachineUsageRecord {
@@ -65,7 +63,7 @@ public class AnalyticsServlet extends HttpServlet {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS)) {
+            try (Connection conn = DatabaseAccessor.GetDatabaseConnection()) {
 
                 // -----------------------------
                 // MACHINE USAGE QUERY
