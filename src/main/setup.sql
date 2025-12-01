@@ -50,3 +50,31 @@ CREATE TABLE reservations (
     FOREIGN KEY (userID) REFERENCES users(uid),
     FOREIGN KEY (machineID) REFERENCES machines(machineID)
 );
+
+--------------------------------------------------
+-- 5. WAITLIST TABLE
+--------------------------------------------------
+CREATE TABLE waitlist (
+    waitID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT NOT NULL,
+    machineID VARCHAR(50) NOT NULL,
+    requestTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notified TINYINT(1) DEFAULT 0,
+
+    FOREIGN KEY (userID) REFERENCES users(uid),
+    FOREIGN KEY (machineID) REFERENCES machines(machineID)
+);
+
+--------------------------------------------------
+-- 6. NOTIFICATION TABLE
+--------------------------------------------------
+CREATE TABLE notifications (
+    notifyID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT NOT NULL,
+    message TEXT NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    readStatus TINYINT(1) DEFAULT 0,
+
+    FOREIGN KEY (userID) REFERENCES users(uid)
+);
+
