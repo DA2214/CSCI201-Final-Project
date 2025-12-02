@@ -119,3 +119,89 @@ body {
   margin-top: 0.8rem;
   font-weight: 600;
 }
+
+
+
+/* ============================
+   Notifications
+   ============================ */
+
+#notification-bell {
+  position: fixed;
+  top: 14px;
+  right: 22px;
+  cursor: pointer;
+  font-size: 26px;
+  color: var(--usc-gold);
+}
+
+#notification-count {
+  background: var(--usc-red);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-left: 4px;
+  font-weight: bold;
+  position: relative;
+  top: -10px;
+}
+
+/* Dropdown panel styled like your cards */
+#notification-dropdown {
+  position: fixed;
+  top: 55px;
+  right: 20px;
+  width: 300px;
+  max-height: 350px;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  overflow-y: auto;
+  display: none;
+  z-index: 9999;
+}
+
+#notification-dropdown h3 {
+  margin: 0 0 10px 0;
+  color: var(--usc-red);
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item small {
+  display: block;
+  color: #777;
+  font-size: 0.8rem;
+  margin-top: 3px;
+}
+
+.notification-mark-btn {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  background: var(--usc-red);
+  color: white;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+}
+
+.notification-mark-btn:hover {
+  background: #7d0000;
+}
+
+/* Show dropdown on bell hover */
+#notification-bell:hover + #notification-dropdown,
+#notification-dropdown:hover {
+  display: block;
+}
+
