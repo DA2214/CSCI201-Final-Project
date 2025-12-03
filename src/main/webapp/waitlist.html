@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>USC Village GymSync – Waitlist</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="waitlist.css">
+</head>
+<body>
+    <!-- NAVBAR  -->
+    <nav class="top-nav">
+        <div class="logo">USC Village GymSync</div>
+        <div class="nav-links">
+            <a href="reservation.html">Reservations</a>
+            <a href="waitlist.html" class="active">Availability</a>
+            <a href="analytics.html">My Analytics</a>
+            <button id="logoutBtn" type="button">Logout</button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="page-content">
+        <section class="card">
+            <h1 class="page-title">Machine Availability & Waitlists</h1>
+            <p class="page-subtitle">
+                View the current status of each machine, how many people are waiting,
+                and join or leave a waitlist when machines are full.
+            </p>
+
+            <!-- Little summary chips -->
+            <div class="summary-row">
+                <div class="summary-chip">
+                    <span class="summary-label">Total Machines</span>
+                    <span id="summaryTotal" class="summary-value">–</span>
+                </div>
+                <div class="summary-chip">
+                    <span class="summary-label">Currently Full</span>
+                    <span id="summaryFull" class="summary-value">–</span>
+                </div>
+                <div class="summary-chip">
+                    <span class="summary-label">My Active Waitlists</span>
+                    <span id="summaryMyWaitlists" class="summary-value">–</span>
+                </div>
+            </div>
+
+            <!-- Filter row -->
+            <div class="filter-row">
+                <label for="filterType">Filter by type:</label>
+                <select id="filterType">
+                    <option value="all">All</option>
+                    <option value="cardio">Cardio</option>
+                    <option value="strength">Strength</option>
+                </select>
+            </div>
+
+            <!-- Machine table -->
+            <div class="table-wrapper">
+                <table class="status-table">
+                    <thead>
+                        <tr>
+                            <th>Machine</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>People on Waitlist</th>
+                            <th>Est. Wait Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="machineTableBody">
+                        <!-- filled by waitlist.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="legend-text">
+                <strong>Legend:</strong> 
+                <span class="status-available">Available</span> machines can be reserved now. 
+                <span class="status-waitlist">Waitlist Only</span> machines are full; you can join the waitlist to be notified when a spot opens.
+            </p>
+        </section>
+
+        <!-- My Waitlists -->
+        <section class="card">
+            <h2 class="section-title">My Active Waitlists</h2>
+            <p class="page-subtitle">
+                Machines where you are currently on the waitlist.
+            </p>
+            <ul id="myWaitlistsList" class="waitlist-list">
+                <!-- filled by waitlist.js -->
+            </ul>
+        </section>
+    </main>
+
+    <!-- JS -->
+    <script src="waitlist.js"></script>
+</body>
+</html>
+
+
+<!-- updated -->
