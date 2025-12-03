@@ -52,7 +52,7 @@ public class DatabaseAccessor {
 
     public static boolean CheckUserExists(String username) {
         try {
-            getUserFromEmailStatement.setString(1, username);
+            getUserFromUsernameStatement.setString(1, username);
             ResultSet rs = getUserFromUsernameStatement.executeQuery();
             return rs.next();
         } catch (SQLException e) {}
