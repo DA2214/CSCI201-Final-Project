@@ -282,5 +282,15 @@
 .btn-join.btn-join-secondary:hover {
     filter: brightness(1.05);
 }
+.status-available {
+    color: green;
+    font-weight: bold;
+}
+
+.status-waitlist {
+    color: #c98a00; /* gold */
+    font-weight: bold;
+}
+
 
   
