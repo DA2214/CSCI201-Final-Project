@@ -21,6 +21,15 @@ Zebah Mamoon files:
 - register.html
 - register.js
 
+Ka Yiu Jason Cheung files:
+- Notification.java
+- NotificationDAO.java
+- NotificationReadServlet.java
+- NotificationServlet.java
+- Notifications.js
+- updated style.css with notification support
+
 Attested by:
 Yash Gupta, 
-Kyna Rochlani
+Kyna Rochlani,
+Ka Yiu Jason Cheung
