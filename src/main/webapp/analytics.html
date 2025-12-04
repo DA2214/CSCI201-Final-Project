@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>User Fitness Analytics</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="analytics.css" />
 </head>
 <body>
@@ -10,9 +11,12 @@
   <nav class="top-nav">
     <div class="logo">USC Village GymSync</div>
     <div class="nav-links">
-      <a href="reservation.html">Reservations</a>
-      <a href="analytics.html" class="active">My Analytics</a>
-      <button id="logoutBtn">Logout</button>
+            <a href="waitlist.html" >Availability</a>
+        <a href="reservation.html">Reservations</a>
+        <a href="analytics.html" class="active">My Analytics</a>
+	    <button type="button" class="nav-auth-btn" onclick="window.location.href='login.html'">
+	      Logout
+	    </button>
     </div>
   </nav>
 

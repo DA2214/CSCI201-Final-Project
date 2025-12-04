@@ -9,15 +9,23 @@
 </head>
 <body>
     <!-- NAVBAR  -->
-    <nav class="top-nav">
-        <div class="logo">USC Village GymSync</div>
-        <div class="nav-links">
-            <a href="reservation.html">Reservations</a>
-            <a href="waitlist.html" class="active">Availability</a>
-            <a href="analytics.html">My Analytics</a>
-            <button id="logoutBtn" type="button">Logout</button>
-        </div>
-    </nav>
+<nav class="top-nav">
+    <div class="logo">USC Village GymSync</div>
+    <div class="nav-links">
+        <!-- Only for logged-in users -->
+                <a href="waitlist.html" class="active">Availability</a>
+        <a href="reservation.html" class="nav-auth-only">Reservations</a>
+        <a href="analytics.html" class="nav-auth-only">My Analytics</a>
+	    <button type="button" class="nav-auth-btn nav-auth-only" onclick="window.location.href='login.html'">
+	      Logout
+	    </button>
+
+        <!-- Only for guests -->
+        <a href="login.html" class="nav-guest-only nav-login-btn">
+            Login / Register
+        </a>
+    </div>
+</nav>
 
     <!-- MAIN CONTENT -->
     <main class="page-content">
@@ -25,7 +33,7 @@
             <h1 class="page-title">Machine Availability & Waitlists</h1>
             <p class="page-subtitle">
                 View the current status of each machine, how many people are waiting,
-                and join or leave a waitlist when machines are full.
+        			and other information regarding waitlists.
             </p>
 
             <!-- Little summary chips -->
@@ -38,7 +46,7 @@
                     <span class="summary-label">Currently Full</span>
                     <span id="summaryFull" class="summary-value">–</span>
                 </div>
-                <div class="summary-chip">
+                <div class="summary-chip guest-only">
                     <span class="summary-label">My Active Waitlists</span>
                     <span id="summaryMyWaitlists" class="summary-value">–</span>
                 </div>
@@ -64,7 +72,7 @@
                             <th>Status</th>
                             <th>People on Waitlist</th>
                             <th>Est. Wait Time</th>
-                            <th>Action</th>
+                            <th class="action-col">Action</th>
                         </tr>
                     </thead>
                     <tbody id="machineTableBody">
@@ -81,7 +89,7 @@
         </section>
 
         <!-- My Waitlists -->
-        <section class="card">
+        <section class="card guest-only">
             <h2 class="section-title">My Active Waitlists</h2>
             <p class="page-subtitle">
                 Machines where you are currently on the waitlist.
@@ -98,4 +106,4 @@
 </html>
 
 
-<!-- updated -->
+<!-- updated!!! -->
