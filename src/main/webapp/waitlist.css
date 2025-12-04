@@ -288,9 +288,45 @@
 }
 
 .status-waitlist {
-    color: #c98a00; /* gold */
+    color: #c98a00; 
     font-weight: bold;
 }
 
+body.guest .guest-only {
+  display: none;
+}
+
+body.guest th.action-col,
+body.guest td.action-col {
+  display: none;
+}
+
+/* Default: guest-specific items hidden, auth nav shown */
+.nav-guest-only {
+  display: none;
+}
+
+/* When body has class "guest": hide auth nav, show guest nav */
+body.guest .nav-auth-only {
+  display: none;
+}
+
+body.guest .nav-guest-only {
+  display: inline-block; 
+}
+
+/* Optional: style for the Login / Register link to look like a button */
+.nav-login-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid #fff;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.nav-login-btn:hover {
+  background-color: rgba(255,255,255,0.12);
+}
 
   

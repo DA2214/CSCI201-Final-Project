@@ -4,16 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reservations</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="reservation.css">
 </head>
 <body>
 	  <nav class="top-nav">
 	  <div class="logo">USC Village GymSync</div>
 	  <div class="nav-links">
-	    <a href="reservation.html" class="active">Reservations</a>
-	    <a href="waitlist.html" >Availability</a>
-	    <a href="analytics.html">My Analytics</a>
-	    <button id="logoutBtn" type="button">Logout</button>
+	          <a href="waitlist.html">Availability</a>
+        <a href="reservation.html" class="active">Reservations</a>
+        <a href="analytics.html" class="nav-auth-only">My Analytics</a>
+	    <button type="button" class="nav-auth-btn" onclick="window.location.href='login.html'">
+	      Logout
+	    </button>
 	  </div>
 	</nav>
 

@@ -1,3 +1,9 @@
+// --- Guest mode detection --------------------------------------
+console.log("waitlist.js loaded, search =", window.location.search);
+const params = new URLSearchParams(window.location.search);
+const isGuest = params.get("guest") === "1";
+console.log("isGuest =", isGuest);
+
 // --- test data ----------------------------------
 
 // average reservation duration in minutes (for estimated wait)
@@ -37,15 +43,25 @@ function isOnMyWaitlist(machineId) {
 function renderSummary() {
     const total = machines.length;
     const full = machines.filter(m => m.status === "Full").length;
-    const myCount = myWaitlistMachineIds.length;
 
     document.getElementById("summaryTotal").textContent = total;
     document.getElementById("summaryFull").textContent = full;
-    document.getElementById("summaryMyWaitlists").textContent = myCount;
+
+    // ⭐ NEW (guest mode): only show personal count if NOT guest
+    const myEl = document.getElementById("summaryMyWaitlists");
+    if (!isGuest && myEl) {
+        const myCount = myWaitlistMachineIds.length;
+        myEl.textContent = myCount;
+    }
 }
 
 function renderMyWaitlists() {
+    // ⭐ NEW (guest mode): guests shouldn't see personal list
+    if (isGuest) return;
+
     const listEl = document.getElementById("myWaitlistsList");
+    if (!listEl) return;
+
     listEl.innerHTML = "";
 
     if (myWaitlistMachineIds.length === 0) {
@@ -127,26 +143,37 @@ function renderTable() {
         waitTd.textContent = computeEstimatedWait(machine.waitlistCount);
         tr.appendChild(waitTd);
 
-        // Action button
+        // ⭐ Action column
         const actionTd = document.createElement("td");
+        actionTd.classList.add("action-col"); // ⭐ for CSS to hide in guest mode
+
         const btn = document.createElement("button");
         btn.classList.add("btn-join");
 
-        if (machine.status === "Available") {
-            btn.textContent = "Book Now";
-            btn.classList.add("btn-join-primary");
-            btn.onclick = () => {
-                // maybe pass machine ID as a query param ???
-                window.location.href = "reservation.html";
-            };
+        if (isGuest) {
+            // ⭐ NEW (guest mode): no real actions
+            // if you are hiding the whole column with CSS, user won't see this anyway
+            btn.textContent = "Log in to join";
+            btn.classList.add("btn-join-disabled");
+            btn.disabled = true;
         } else {
-            if (isOnMyWaitlist(machine.id)) {
-                btn.textContent = "On Waitlist";
-                btn.classList.add("btn-join-disabled");
-            } else {
-                btn.textContent = "Join Waitlist";
+            // existing logged-in behavior
+            if (machine.status === "Available") {
+                btn.textContent = "Book Now";
                 btn.classList.add("btn-join-primary");
-                btn.onclick = () => joinWaitlist(machine.id);
+                btn.onclick = () => {
+                    // maybe pass machine ID as a query param ???
+                    window.location.href = "reservation.html";
+                };
+            } else {
+                if (isOnMyWaitlist(machine.id)) {
+                    btn.textContent = "On Waitlist";
+                    btn.classList.add("btn-join-disabled");
+                } else {
+                    btn.textContent = "Join Waitlist";
+                    btn.classList.add("btn-join-primary");
+                    btn.onclick = () => joinWaitlist(machine.id);
+                }
             }
         }
 
@@ -160,6 +187,9 @@ function renderTable() {
 // --- Actions ------------------------------------------------------
 
 function joinWaitlist(machineId) {
+    // guests shouldn't be able to call this (extra guard)
+    if (isGuest) return;
+
     const machine = machines.find(m => m.id === machineId);
     if (!machine) return;
 
@@ -184,6 +214,9 @@ function joinWaitlist(machineId) {
 }
 
 function leaveWaitlist(machineId) {
+    // guests shouldn't be here either, but just in case:
+    if (isGuest) return;
+
     const machine = machines.find(m => m.id === machineId);
     if (!machine) return;
 
@@ -199,15 +232,25 @@ function leaveWaitlist(machineId) {
 
 // --- Init ---------------------------------------------------------
 
-document.addEventListener("DOMContentLoaded", () => {
+// ⭐ NEW: move init logic into a function, called after we toggle guest class
+function initWaitlistPage() {
     const filterSelect = document.getElementById("filterType");
-    filterSelect.addEventListener("change", () => {
-        renderTable();
-    });
+    if (filterSelect) {
+        filterSelect.addEventListener("change", () => {
+            renderTable();
+        });
+    }
 
     renderSummary();
     renderTable();
     renderMyWaitlists();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (isGuest) {
+        document.body.classList.add("guest");
+    }
+
+    initWaitlistPage();
 });
 
-//updated
