@@ -21,7 +21,7 @@ Zebah Mamoon files:
 - register.html = full
 - register.js = full
 
-
+All other members' contributions are visible through GitHub commits. 
 Attested by:
 Yash Gupta, 
 Kyna Rochlani,
