@@ -68,11 +68,12 @@ public class AnalyticsServlet extends HttpServlet {
                 // -----------------------------
                 // MACHINE USAGE QUERY
                 // -----------------------------
+                // Updated to use new Machines table
                 String usageQuery =
                         "SELECT mu.usageID, mu.duration, mu.date, " +
-                        "       m.machineID, m.machineName " +
+                        "       CAST(m.machineId AS CHAR) AS machineID, m.name AS machineName " +
                         "FROM machineusage mu " +
-                        "JOIN machines m ON mu.machineID = m.machineID " +
+                        "JOIN Machines m ON mu.machineID = m.name " +
                         "WHERE mu.userID = ?";
 
                 PreparedStatement usageStmt = conn.prepareStatement(usageQuery);
@@ -90,13 +91,14 @@ public class AnalyticsServlet extends HttpServlet {
                 }
 
                 // -----------------------------
-                // RESERVATION QUERY
+                // WORKOUT HISTORY QUERY
                 // -----------------------------
+                // Updated to use new Machines table
                 String reservationQuery =
                         "SELECT r.reservationId, r.startTime, r.endTime, r.status, r.date, " +
-                        "       m.machineID, m.machineName " +
-                        "FROM reservations r " +
-                        "JOIN machines m ON r.machineID = m.machineID " +
+                        "       CAST(m.machineId AS CHAR) AS machineID, m.name AS machineName " +
+                        "FROM workout_history r " +
+                        "JOIN Machines m ON r.machineID = m.name " +
                         "WHERE r.userID = ?";
 
                 PreparedStatement resStmt = conn.prepareStatement(reservationQuery);
