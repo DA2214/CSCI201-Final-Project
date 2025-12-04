@@ -249,6 +249,12 @@ function initWaitlistPage() {
 document.addEventListener("DOMContentLoaded", () => {
     if (isGuest) {
         document.body.classList.add("guest");
+
+        // keep guest flag when clicking Availability in the navbar
+        const availabilityLink = document.querySelector('.nav-links a[href="waitlist.html"]');
+        if (availabilityLink) {
+            availabilityLink.href = "waitlist.html?guest=1";
+        }
     }
 
     initWaitlistPage();
