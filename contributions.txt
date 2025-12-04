@@ -8,12 +8,17 @@ analytics.js - full
 style.css - tweaks to make UI consistent
 reservation.css - tweaks to make UI consistent 
 
-
 Kyna Rochlani files: 
 
 - reservation.css = full
 - reservation.js = full
 - reservation.html = full
 
+Zebah Mamoon files:
+- login.html
+- style.css
+- login.js
+- register.html
+- register.js
 Attested by:
 Yash Gupta, 
