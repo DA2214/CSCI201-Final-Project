@@ -2,11 +2,11 @@ Front End Contributions
 The commits of Kyna Rochlani, Zebah Mamoon, and Yash Gupta got erased when the project was refactored to an eclipse format of file directories.
 This document lists the files we worked on: 
 Yash Gupta files:
-analytics.html - full
-analytics.css - full
-analytics.js - full 
-style.css - tweaks to make UI consistent
-reservation.css - tweaks to make UI consistent 
+- analytics.html = full
+- analytics.css = full
+- analytics.js = full 
+- style.css = tweaks to make UI consistent
+- reservation.css = tweaks to make UI consistent 
 
 Kyna Rochlani files: 
 
@@ -15,11 +15,11 @@ Kyna Rochlani files:
 - reservation.html = full
 
 Zebah Mamoon files:
-- login.html
-- style.css
-- login.js
-- register.html
-- register.js
+- login.html = full
+- style.css = full
+- login.js = full
+- register.html = full
+- register.js = full
 
 Ka Yiu Jason Cheung files:
 - Notification.java
@@ -31,5 +31,10 @@ Ka Yiu Jason Cheung files:
 
 Attested by:
 Yash Gupta, 
+<<<<<<< HEAD
 Kyna Rochlani,
 Ka Yiu Jason Cheung
+=======
+Kyna Rochlani
+Zebah Mamoon 
+>>>>>>> branch 'main' of git@github.com:DA2214/CSCI201-Final-Project.git
