@@ -3,3 +3,8 @@
 /AnalyticsServlet$UserHistoryResponse.class
 /AnalyticsServlet.class
 /DatabaseAccessor.class
+/Notification.class
+/NotificationDAO
+/NotificationDAO.class
+/NotificationServlet.class
+/NotificationReadServlet.class
