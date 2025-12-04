@@ -21,20 +21,9 @@ Zebah Mamoon files:
 - register.html = full
 - register.js = full
 
-Ka Yiu Jason Cheung files:
-- Notification.java
-- NotificationDAO.java
-- NotificationReadServlet.java
-- NotificationServlet.java
-- Notifications.js
-- updated style.css with notification support
 
 Attested by:
 Yash Gupta, 
-<<<<<<< HEAD
 Kyna Rochlani,
-Ka Yiu Jason Cheung
-=======
-Kyna Rochlani
-Zebah Mamoon 
->>>>>>> branch 'main' of git@github.com:DA2214/CSCI201-Final-Project.git
+Ka Yiu Jason Cheung,
+
