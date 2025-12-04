@@ -7,3 +7,10 @@ analytics.css - full
 analytics.js - full 
 style.css - tweaks to make UI consistent
 reservation.css - tweaks to make UI consistent 
+
+
+Kyna Rochlani files: 
+
+- reservation.css = full
+- reservation.js = full
+- reservation.html = full
