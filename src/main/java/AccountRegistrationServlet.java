@@ -1,13 +1,15 @@
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-import java.io.IOException;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/LoginRequestServlet")
-public class LoginRequestServlet extends HttpServlet {
+import java.io.IOException;
+
+@WebServlet("/AccountRegistrationServlet")
+public class AccountRegistrationServlet extends HttpServlet {
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -19,22 +21,22 @@ public class LoginRequestServlet extends HttpServlet {
         }
     }
 
-
     @Override
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
+        String email = req.getParameter("email");
         String password = req.getParameter("password");
 
         DatabaseAccessor.getLock().lock();
         try {
-            int userId = DatabaseAccessor.LoginUser(username, password);
-            if (userId != -1) {
+            if (!DatabaseAccessor.CheckEmailExists(email) && !DatabaseAccessor.CheckUserExists(username)) {
+                int userID = DatabaseAccessor.RegisterUser(username, email, password);
+
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                 resp.setContentType("application/json");
-
-                resp.getWriter().print(gson.toJson(new UserIdResponse(userId)));
+                resp.getWriter().print(gson.toJson(new UserIdResponse(userID)));
             } else {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
             }
         } finally {
             DatabaseAccessor.getLock().unlock();

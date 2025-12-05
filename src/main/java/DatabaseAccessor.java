@@ -58,22 +58,22 @@ public class DatabaseAccessor {
         }
     }
 
-    public static boolean LoginUser(String username, String password) {
+    public static int LoginUser(String username, String password) {
         CheckLock();
-        if (username == null || password == null) { return false; }
+        if (username == null || password == null) { return -1; }
 
         try {
             getUserFromUsernameStatement.setString(1, username);
             try (ResultSet rs = getUserFromUsernameStatement.executeQuery()) {
                 if (rs.next() && rs.getString("password").equals(password)) {
-                    return true;
+                    return rs.getInt("uid");
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return false;
+        return -1;
     }
 
     public static boolean CheckUserExists(String username) {
@@ -100,20 +100,24 @@ public class DatabaseAccessor {
         return false;
     }
 
-    public static boolean RegisterUser(String username, String password, String email) {
+    public static int RegisterUser(String username, String password, String email) {
         CheckLock();
-        if (CheckUserExists(username) || CheckEmailExists(email)) return false;
+        if (CheckUserExists(username) || CheckEmailExists(email)) return -1;
 
         try {
             insertUserStatement.setString(1, username);
             insertUserStatement.setString(2, email);
             insertUserStatement.setString(3, password);
             insertUserStatement.executeUpdate();
-            return true;
+            try (ResultSet resultSet = insertUserStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("uid");
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return -1;
     }
 
     public static Lock getLock() {
