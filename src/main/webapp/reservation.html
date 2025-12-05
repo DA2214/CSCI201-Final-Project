@@ -31,13 +31,7 @@
         <div class="form-group">
           <label for="machine">Select Machine:</label>
           <select id="machine" required>
-            <option value="">-- Select --</option>
-            <option value="Treadmill 1">Treadmill 1</option>
-            <option value="Bench Press 1">Bench Press 1</option>
-            <option value="Bike 1">Bike 1</option>
-            <option value="Elliptical 1">Elliptical 1</option>
-            <option value="Lat Pulldown">Lat Pulldown</option>
-            <option value="Leg Press">Leg Press</option>
+            <option value="">Loading machines...</option>
           </select>
         </div>
 
@@ -57,8 +51,10 @@
         <!-- Buttons -->
         <div class="button-row">
           <button type="submit" id="reserveBtn">Reserve Machine</button>
-          <button type="button" id="waitlistBtn" class="secondary">Join Waitlist</button>
+          <button type="button" id="startBtn" class="secondary">Start Workout</button>
+          <button type="button" id="cancelBtn" class="ghost">Cancel Reservation</button>
         </div>
+        <p class="helper-text">Reserve first, start within 5 minutes, or cancel if you can’t make it.</p>
       </form>
 
       <div id="message" class="message"></div>
@@ -75,18 +71,7 @@
             <th>Status</th>
           </tr>
         </thead>
-        <tbody id="reservationHistory">
-          <tr>
-            <td>Treadmill 2</td>
-            <td>60 minutes</td>
-            <td class="confirmed">Confirmed</td>
-          </tr>
-          <tr>
-            <td>Bench 1</td>
-            <td>30 minutes</td>
-            <td class="waitlisted">Waitlisted</td>
-          </tr>
-        </tbody>
+        <tbody id="reservationHistory"></tbody>
       </table>
     </section>
   </main>

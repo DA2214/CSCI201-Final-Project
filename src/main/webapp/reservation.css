@@ -132,34 +132,52 @@
     margin-top: 1.2rem;
   }
   
-  button {
-    background-color: var(--usc-red);
-    color: #fff;
-    border: none;
-    padding: 0.8rem 1.5rem;
+button {
+  background-color: var(--usc-red);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
     border-radius: var(--radius);
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s ease-in-out;
   }
   
-  button:hover {
-    background-color: #7d0000;
-  }
-  
-  button.secondary {
-    background: var(--usc-gold);
-    color: #000;
-  }
-  
-  button.secondary:hover {
-    background: #e6c200;
-  }
-  
-  .message {
-    margin-top: 1.5rem;
-    font-weight: 600;
-    font-size: 1.1rem;
+button:hover {
+  background-color: #7d0000;
+}
+
+button.secondary {
+  background: var(--usc-gold);
+  color: #000;
+}
+
+button.secondary:hover {
+  background: #e6c200;
+}
+
+button.ghost {
+  background: #fff;
+  color: var(--usc-red);
+  border: 1px solid var(--usc-red);
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.helper-text {
+  color: #555;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.message {
+  margin-top: 1.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
   }
   
   /* Table */
@@ -189,20 +207,41 @@
     border-bottom: 1px solid #ddd;
   }
   
-  th {
-    background: var(--usc-red);
-    color: var(--usc-gold);
-  }
-  
-  .confirmed {
-    color: green;
-    font-weight: bold;
-  }
-  
-  .waitlisted {
-    color: orange;
-    font-weight: bold;
-  }
+th {
+  background: var(--usc-red);
+  color: var(--usc-gold);
+}
+
+.confirmed {
+  color: green;
+  font-weight: bold;
+}
+
+.waitlisted {
+  color: orange;
+  font-weight: bold;
+}
+
+.reserved {
+  color: var(--usc-red);
+  font-weight: bold;
+}
+
+.in-progress {
+  color: #0a7a2d;
+  font-weight: bold;
+}
+
+.cancelled {
+  color: #555;
+  font-weight: bold;
+}
+
+.table-empty {
+  text-align: center;
+  color: #555;
+  font-style: italic;
+}
   
   /* Footer */
   footer {
