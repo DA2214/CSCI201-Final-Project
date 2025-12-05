@@ -1,4 +1,4 @@
-function loginUser() {
+async function loginUser() {
     let u = document.getElementById("login-username").value.trim();
     let p = document.getElementById("login-password").value.trim();
     let err = document.getElementById("login-error");
@@ -10,31 +10,29 @@ function loginUser() {
 
     err.textContent = "";
 
-    fetch("LoginRequestServlet", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: `username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}`
-    })
-    .then(async response => {
-        if (response.status === 202) {
-            let data = await response.json();
-            localStorage.setItem("userId", data.userId);
+    try {
+        let resp = await fetch("LoginRequestServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}`
+        });
 
+        if (resp.status === 202) {
+            let data = await resp.json();
+            localStorage.setItem("userId", data.userId);
             window.location.href = "waitlist.html";
-        }
-        else if (response.status === 400) {
-            err.textContent = "Invalid username.";
-        }
-        else if (response.status === 404) {
+        } 
+        else if (resp.status === 404) {
             err.textContent = "Incorrect username or password.";
-        }
+        } 
+        else if (resp.status === 400) {
+            err.textContent = "Invalid username.";
+        } 
         else {
-            err.textContent = "Unexpected server error.";
+            err.textContent = "Login failed.";
         }
-    })
-    .catch(() => {
-        err.textContent = "Network error.";
-    });
+    } 
+    catch (e) {
+        err.textContent = "Connection error.";
+    }
 }
