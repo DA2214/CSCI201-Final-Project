@@ -27,6 +27,13 @@ public class AccountRegistrationServlet extends HttpServlet {
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
+        if (!FieldValidationUtil.IsUsernameValid(username)) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid username");
+        }
+        if (!FieldValidationUtil.IsEmailValid(email)) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid email");
+        }
+
         DatabaseAccessor.getLock().lock();
         try {
             if (!DatabaseAccessor.CheckEmailExists(email) && !DatabaseAccessor.CheckUserExists(username)) {

@@ -25,6 +25,10 @@ public class LoginRequestServlet extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
+        if (!FieldValidationUtil.IsUsernameValid(username)) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid username");
+        }
+
         DatabaseAccessor.getLock().lock();
         try {
             int userId = DatabaseAccessor.LoginUser(username, password);

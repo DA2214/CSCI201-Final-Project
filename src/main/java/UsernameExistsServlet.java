@@ -11,7 +11,8 @@ public class UsernameExistsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
-        if (username == null) {
+
+        if (!FieldValidationUtil.IsUsernameValid(username)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username is required");
         }
         DatabaseAccessor.getLock().lock();
