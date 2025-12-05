@@ -18,6 +18,21 @@ public class DatabaseAccessor {
     private static final ReentrantLock lock = new ReentrantLock();
 
     static {
+        InitializeConnection();
+    }
+
+    public static Connection GetDatabaseConnection() throws SQLException {
+        CheckLock();
+        if (connection != null && !connection.isClosed()) {
+            return connection;
+        } else {
+            InitializeConnection();
+            if (connection != null && !connection.isClosed()) return connection;
+            throw new SQLException("Could not initialize database connection, please check server");
+        }
+    }
+
+    public static void InitializeConnection() {
         try {
             connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS);
 
@@ -27,15 +42,6 @@ public class DatabaseAccessor {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Could not initialize database connection, please check server: " + e.getMessage());
-        }
-    }
-
-    public static Connection GetDatabaseConnection() throws SQLException {
-        CheckLock();
-        if (connection != null && !connection.isClosed()) {
-            return connection;
-        } else {
-            throw new SQLException("Could not initialize database connection, please check server");
         }
     }
 
