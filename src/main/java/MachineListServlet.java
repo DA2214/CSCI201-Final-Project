@@ -44,12 +44,13 @@ public class MachineListServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
+        DatabaseAccessor.getLock().lock();;
         try {
+            Connection conn = DatabaseAccessor.GetDatabaseConnection();
+
             // Expire old reservations before listing machines
             ReservationService.expireOldReservations();
 
-            Connection conn = DatabaseAccessor.GetDatabaseConnection();
-            
             // Get all machines
             String query = "SELECT machineId, name, type, status FROM Machines ORDER BY type, name";
             List<Machine> machines = new ArrayList<>();
@@ -74,6 +75,8 @@ public class MachineListServlet extends HttpServlet {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().write(gson.toJson(new ErrorResponse("Error fetching machines: " + e.getMessage())));
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 

@@ -73,16 +73,20 @@ public class WaitlistServlet extends HttpServlet {
         int userID = Integer.parseInt(data.get("userID"));
         String machineID = data.get("machineID");
 
-        Connection conn = DatabaseAccessor.GetDatabaseConnection();
+        DatabaseAccessor.getLock().lock();
+        try {
+            Connection conn = DatabaseAccessor.GetDatabaseConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO waitlist (userID, machineID, notified) VALUES (?, ?, 0)"
+            );
+            ps.setInt(1, userID);
+            ps.setString(2, machineID);
+            ps.executeUpdate();
 
-        PreparedStatement ps = conn.prepareStatement(
-            "INSERT INTO waitlist (userID, machineID, notified) VALUES (?, ?, 0)"
-        );
-        ps.setInt(1, userID);
-        ps.setString(2, machineID);
-        ps.executeUpdate();
-
-        send(resp, true, "User added to waitlist.");
+            send(resp, true, "User added to waitlist.");
+        } finally {
+            DatabaseAccessor.getLock().unlock();
+        }
     }
 
     // CLAIM reservation
@@ -92,16 +96,21 @@ public class WaitlistServlet extends HttpServlet {
         int userID = Integer.parseInt(data.get("userID"));
         String machineID = data.get("machineID");
 
-        Connection conn = DatabaseAccessor.GetDatabaseConnection();
+        DatabaseAccessor.getLock().lock();
+        try {
+            Connection conn = DatabaseAccessor.GetDatabaseConnection();
 
-        PreparedStatement del = conn.prepareStatement(
-            "DELETE FROM waitlist WHERE userID = ? AND machineID = ? LIMIT 1"
-        );
-        del.setInt(1, userID);
-        del.setString(2, machineID);
-        del.executeUpdate();
+            PreparedStatement del = conn.prepareStatement(
+                "DELETE FROM waitlist WHERE userID = ? AND machineID = ? LIMIT 1"
+            );
+            del.setInt(1, userID);
+            del.setString(2, machineID);
+            del.executeUpdate();
 
-        send(resp, true, "Slot successfully claimed.");
+            send(resp, true, "Slot successfully claimed.");
+        } finally {
+            DatabaseAccessor.getLock().unlock();
+        }
     }
 
     // DECLINE -> notify next user
@@ -111,47 +120,53 @@ public class WaitlistServlet extends HttpServlet {
         int userID = Integer.parseInt(data.get("userID"));
         String machineID = data.get("machineID");
 
-        Connection conn = DatabaseAccessor.GetDatabaseConnection();
+        DatabaseAccessor.getLock().lock();
 
-        // Remove declining user
-        PreparedStatement del = conn.prepareStatement(
-            "DELETE FROM waitlist WHERE userID = ? AND machineID = ? LIMIT 1"
-        );
-        del.setInt(1, userID);
-        del.setString(2, machineID);
-        del.executeUpdate();
+        try {
+            Connection conn = DatabaseAccessor.GetDatabaseConnection();
 
-        // Get next user
-        PreparedStatement next = conn.prepareStatement(
-            "SELECT userID FROM waitlist WHERE machineID = ? AND notified = 0 ORDER BY waitID ASC LIMIT 1"
-        );
-        next.setString(1, machineID);
-        ResultSet rs = next.executeQuery();
+            // Remove declining user
+            PreparedStatement del = conn.prepareStatement(
+                "DELETE FROM waitlist WHERE userID = ? AND machineID = ? LIMIT 1"
+            );
+            del.setInt(1, userID);
+            del.setString(2, machineID);
+            del.executeUpdate();
 
-        if (!rs.next()) {
-            send(resp, true, "User declined. No one else is waiting.");
-            return;
+            // Get next user
+            PreparedStatement next = conn.prepareStatement(
+                "SELECT userID FROM waitlist WHERE machineID = ? AND notified = 0 ORDER BY waitID ASC LIMIT 1"
+            );
+            next.setString(1, machineID);
+            ResultSet rs = next.executeQuery();
+
+            if (!rs.next()) {
+                send(resp, true, "User declined. No one else is waiting.");
+                return;
+            }
+
+            int nextUserID = rs.getInt("userID");
+
+            // Create notification
+            PreparedStatement notify = conn.prepareStatement(
+                "INSERT INTO notifications (userID, message) VALUES (?, ?)"
+            );
+            notify.setInt(1, nextUserID);
+            notify.setString(2, "A slot has opened for machine: " + machineID);
+            notify.executeUpdate();
+
+            // Mark notified
+            PreparedStatement update = conn.prepareStatement(
+                "UPDATE waitlist SET notified = 1 WHERE userID = ? AND machineID = ?"
+            );
+            update.setInt(1, nextUserID);
+            update.setString(2, machineID);
+            update.executeUpdate();
+
+            send(resp, true, "User declined. Next user has been notified.");
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
-
-        int nextUserID = rs.getInt("userID");
-
-        // Create notification
-        PreparedStatement notify = conn.prepareStatement(
-            "INSERT INTO notifications (userID, message) VALUES (?, ?)"
-        );
-        notify.setInt(1, nextUserID);
-        notify.setString(2, "A slot has opened for machine: " + machineID);
-        notify.executeUpdate();
-
-        // Mark notified
-        PreparedStatement update = conn.prepareStatement(
-            "UPDATE waitlist SET notified = 1 WHERE userID = ? AND machineID = ?"
-        );
-        update.setInt(1, nextUserID);
-        update.setString(2, machineID);
-        update.executeUpdate();
-
-        send(resp, true, "User declined. Next user has been notified.");
     }
 
     // Send JSON response

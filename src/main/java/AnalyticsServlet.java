@@ -62,8 +62,9 @@ public class AnalyticsServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            try (Connection conn = DatabaseAccessor.GetDatabaseConnection()) {
+            DatabaseAccessor.getLock();
+            try {
+                    Connection conn = DatabaseAccessor.GetDatabaseConnection();
 
                 // -----------------------------
                 // MACHINE USAGE QUERY
@@ -125,13 +126,15 @@ public class AnalyticsServlet extends HttpServlet {
 
                 out.print(json);
                 out.flush();
-
+            } catch (SQLException e) {
+                throw new SQLException(e);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Server Error: " + e.getMessage());
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 }

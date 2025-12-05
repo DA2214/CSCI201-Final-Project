@@ -1,6 +1,8 @@
 
 
 import java.sql.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseAccessor {
 
@@ -12,6 +14,8 @@ public class DatabaseAccessor {
     private static PreparedStatement getUserFromUsernameStatement = null;
     private static PreparedStatement getUserFromEmailStatement = null;
     private static PreparedStatement insertUserStatement = null;
+
+    private static final ReentrantLock lock = new ReentrantLock();
 
     static {
         try {
@@ -27,7 +31,8 @@ public class DatabaseAccessor {
     }
 
     public static Connection GetDatabaseConnection() throws SQLException {
-        if (connection != null) {
+        CheckLock();
+        if (connection != null && !connection.isClosed()) {
             return connection;
         } else {
             throw new SQLException("Could not initialize database connection, please check server");
@@ -35,6 +40,7 @@ public class DatabaseAccessor {
     }
 
     public static boolean LoginUser(String username, String password) {
+        CheckLock();
         if (username == null || password == null) { return false; }
 
         try {
@@ -51,6 +57,7 @@ public class DatabaseAccessor {
     }
 
     public static boolean CheckUserExists(String username) {
+        CheckLock();
         try {
             getUserFromUsernameStatement.setString(1, username);
             ResultSet rs = getUserFromUsernameStatement.executeQuery();
@@ -60,6 +67,7 @@ public class DatabaseAccessor {
     }
 
     public static boolean CheckEmailExists(String email) {
+        CheckLock();
         try {
             getUserFromEmailStatement.setString(1, email);
             ResultSet rs = getUserFromEmailStatement.executeQuery();
@@ -69,6 +77,7 @@ public class DatabaseAccessor {
     }
 
     public static boolean RegisterUser(String username, String password, String email) {
+        CheckLock();
         if (CheckUserExists(username) || CheckEmailExists(email)) return false;
 
         try {
@@ -81,5 +90,15 @@ public class DatabaseAccessor {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static Lock getLock() {
+        return lock;
+    }
+
+    private static void CheckLock() {
+        if (!lock.isHeldByCurrentThread()) {
+            throw new IllegalStateException("Please acquire the lock on the class before running methods on the class");
+        }
     }
 }

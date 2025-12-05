@@ -24,6 +24,7 @@ public class ReservationService {
      * Called automatically at the start of each reservation operation
      */
     public static void expireOldReservations() {
+        DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
             Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -112,6 +113,8 @@ public class ReservationService {
             
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 
@@ -165,6 +168,7 @@ public class ReservationService {
      * @return Reservation ID if successful, -1 if failed
      */
     public static int createReservation(int userId, int machineId, int durationMinutes) {
+        DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
             
@@ -240,6 +244,8 @@ public class ReservationService {
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 
@@ -252,6 +258,7 @@ public class ReservationService {
      * @return true if successful, false if no reservation or already started
      */
     public static boolean startMachine(int userId, int machineId) {
+        DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
             
@@ -320,6 +327,8 @@ public class ReservationService {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 
@@ -331,6 +340,7 @@ public class ReservationService {
      * @return true if successful, false if no reservation or already started
      */
     public static boolean cancelReservation(int userId, int machineId) {
+        DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
             
@@ -382,6 +392,8 @@ public class ReservationService {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 
@@ -393,6 +405,7 @@ public class ReservationService {
      * @return Seconds remaining, or -1 if no active reservation
      */
     public static long getClaimTimeRemaining(int userId, int machineId) {
+        DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
             
@@ -429,6 +442,8 @@ public class ReservationService {
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 }

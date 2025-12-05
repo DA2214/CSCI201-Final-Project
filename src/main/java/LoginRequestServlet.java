@@ -1,5 +1,3 @@
-package main.java;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -19,13 +17,18 @@ public class LoginRequestServlet extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        if (DatabaseAccessor.LoginUser(username, password)) {
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
+        DatabaseAccessor.getLock().lock();
+        try {
+            if (DatabaseAccessor.LoginUser(username, password)) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType("application/json");
 
-            // TODO write json response
-        } else {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                // TODO write json response
+            } else {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
+        } finally {
+            DatabaseAccessor.getLock().unlock();
         }
     }
 }
