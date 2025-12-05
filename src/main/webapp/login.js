@@ -1,4 +1,4 @@
-function loginUser() {
+async function loginUser() {
     let u = document.getElementById("login-username").value.trim();
     let p = document.getElementById("login-password").value.trim();
     let err = document.getElementById("login-error");
@@ -9,5 +9,30 @@ function loginUser() {
     }
 
     err.textContent = "";
-    alert("Login request sent.");
+
+    try {
+        let resp = await fetch("LoginRequestServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}`
+        });
+
+        if (resp.status === 202) {
+            let data = await resp.json();
+            localStorage.setItem("userId", data.userId);
+            window.location.href = "waitlist.html";
+        } 
+        else if (resp.status === 404) {
+            err.textContent = "Incorrect username or password.";
+        } 
+        else if (resp.status === 400) {
+            err.textContent = "Invalid username.";
+        } 
+        else {
+            err.textContent = "Login failed.";
+        }
+    } 
+    catch (e) {
+        err.textContent = "Connection error.";
+    }
 }
