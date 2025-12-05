@@ -44,7 +44,7 @@ public class MachineListServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        DatabaseAccessor.getLock().lock();;
+        DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
 

@@ -22,7 +22,8 @@ public class DatabaseAccessor {
     }
 
     public static Connection GetDatabaseConnection() throws SQLException {
-        CheckLock();
+        // Note: Lock should already be held by caller - do not call CheckLock() here
+        // to avoid infinite recursion with CheckLock() -> GetDatabaseConnection() -> CheckLock()
         if (connection != null && !connection.isClosed()) {
             return connection;
         } else {
@@ -47,11 +48,17 @@ public class DatabaseAccessor {
                 }
             }
 
+            // Load MySQL JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            
             connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS);
 
             getUserFromUsernameStatement = connection.prepareStatement("SELECT * FROM users WHERE username = ?");
             getUserFromEmailStatement = connection.prepareStatement("SELECT * FROM users WHERE email = ?");
             insertUserStatement = connection.prepareStatement("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Could not load MySQL JDBC driver: " + e.getMessage());
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Could not initialize database connection, please check server: " + e.getMessage());
