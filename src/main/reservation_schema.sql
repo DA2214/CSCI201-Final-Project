@@ -9,7 +9,7 @@
 -- Completed workouts are automatically pushed to workout_history.
 -- ================================================================
 
-USE TrojanTracker;
+USE GymSync;
 
 --------------------------------------------------
 -- RESERVATIONS TABLE

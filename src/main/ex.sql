@@ -1,4 +1,4 @@
-USE TrojanTracker;
+USE GymSync;
 
 -- Create test user (auto assigned uid)
 INSERT INTO users (username, email, password)

@@ -1,7 +1,7 @@
 -- Create the database
-DROP DATABASE IF EXISTS TrojanTracker;
-CREATE DATABASE TrojanTracker;
-USE TrojanTracker;
+DROP DATABASE IF EXISTS GymSync;
+CREATE DATABASE GymSync;
+USE GymSybc;
 
 --------------------------------------------------
 -- 1. USERS TABLE

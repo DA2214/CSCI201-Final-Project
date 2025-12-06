@@ -6,7 +6,7 @@
 -- Updated to use 'cardio' and 'strength' types for frontend filtering
 -- ================================================================
 
-USE TrojanTracker;
+USE GymSync;
 
 -- Clear existing machines if needed (comment out to preserve existing data)
 -- TRUNCATE TABLE Machines;
