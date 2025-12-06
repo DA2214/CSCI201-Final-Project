@@ -13,8 +13,8 @@ const state = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  renderHistory();
   loadMachines();
+  loadReservations();
 });
 
 form.addEventListener("submit", (e) => {
@@ -25,6 +25,39 @@ form.addEventListener("submit", (e) => {
 
 startBtn.addEventListener("click", () => sendReservationAction("start"));
 cancelBtn.addEventListener("click", () => sendReservationAction("cancel"));
+
+/**
+ * Load active reservations from backend and populate history table
+ */
+async function loadReservations() {
+  const userId = resolveUserId();
+  if (!userId) {
+    renderHistory();
+    return;
+  }
+
+  try {
+    const resp = await fetch(`reservation?userId=${userId}`);
+    if (!resp.ok) {
+      throw new Error("Failed to load reservations.");
+    }
+    const reservations = await resp.json();
+    
+    // Convert backend format to frontend format
+    state.history = Array.isArray(reservations) ? reservations.map(r => ({
+      machineId: r.machineId,
+      machineName: r.machineName || `Machine ${r.machineId}`,
+      duration: r.intendedDuration,
+      status: r.workoutStartTime ? "In Progress" : "Reserved",
+      className: r.workoutStartTime ? "in-progress" : "reserved"
+    })) : [];
+    
+    renderHistory();
+  } catch (err) {
+    console.error("Error loading reservations:", err);
+    renderHistory(); // Render empty state on error
+  }
+}
 
 /**
  * Load machines from backend and populate dropdown
@@ -103,6 +136,7 @@ async function sendReservationAction(action, { duration } = {}) {
 
     handleActionSuccess(action, data, { machineId, duration: payload.duration });
     loadMachines();
+    loadReservations(); // Refresh reservations table after action
   } catch (err) {
     showMessage(err.message || "Something went wrong.", "#b00020");
   } finally {

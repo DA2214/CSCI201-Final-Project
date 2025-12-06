@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
  * 5. Auto-releases when workout duration completes
  * 
  * Endpoints:
+ * - GET /reservation?userId=123 - Get all active reservations for a user
  * - POST /reservation with action="reserve" - Create reservation
  * - POST /reservation with action="start" - Start workout
  * - POST /reservation with action="cancel" - Cancel reservation (before start only)
@@ -32,6 +33,42 @@ public class ReservationServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    /**
+     * GET /reservation - Get all active reservations for a user
+     * 
+     * Query Parameters:
+     * - userId: User ID (integer, required)
+     * 
+     * Returns JSON array of reservations with machine names
+     */
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        try {
+            String userIdStr = req.getParameter("userId");
+            if (userIdStr == null || userIdStr.isEmpty()) {
+                sendError(resp, "Missing 'userId' parameter");
+                return;
+            }
+
+            int userId = Integer.parseInt(userIdStr);
+            java.util.List<ReservationService.ReservationWithMachine> reservations = 
+                ReservationService.getUserReservations(userId);
+
+            resp.getWriter().write(gson.toJson(reservations));
+
+        } catch (NumberFormatException e) {
+            sendError(resp, "Invalid user ID format");
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendError(resp, "Server error: " + e.getMessage());
+        }
+    }
 
     /**
      * POST /reservation - Handle reservation operations
