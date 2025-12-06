@@ -398,6 +398,62 @@ public class ReservationService {
     }
 
     /**
+     * Get all active reservations for a user
+     * 
+     * @param userId User's ID
+     * @return List of reservations with machine names, or empty list if none found
+     */
+    public static List<ReservationWithMachine> getUserReservations(int userId) {
+        DatabaseAccessor.getLock().lock();
+        try {
+            Connection conn = DatabaseAccessor.GetDatabaseConnection();
+            
+            // Expire old reservations first
+            expireOldReservations();
+            
+            // Get all active reservations for this user with machine names
+            String query = "SELECT r.reservationId, r.userId, r.machineId, r.createdAt, r.expiresAt, " +
+                         "r.status, r.intendedDuration, r.workoutStartTime, r.workoutEndTime, " +
+                         "m.name AS machineName " +
+                         "FROM Reservations r " +
+                         "JOIN Machines m ON r.machineId = m.machineId " +
+                         "WHERE r.userId = ? AND r.status = ? " +
+                         "ORDER BY r.createdAt DESC";
+            
+            List<ReservationWithMachine> reservations = new ArrayList<>();
+            
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setInt(1, userId);
+                ps.setString(2, ReservationStatus.ACTIVE.name());
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        ReservationWithMachine res = new ReservationWithMachine();
+                        res.reservationId = rs.getInt("reservationId");
+                        res.userId = rs.getInt("userId");
+                        res.machineId = rs.getInt("machineId");
+                        res.machineName = rs.getString("machineName");
+                        res.createdAt = rs.getTimestamp("createdAt");
+                        res.expiresAt = rs.getTimestamp("expiresAt");
+                        res.status = ReservationStatus.valueOf(rs.getString("status"));
+                        res.intendedDuration = rs.getInt("intendedDuration");
+                        res.workoutStartTime = rs.getTimestamp("workoutStartTime");
+                        res.workoutEndTime = rs.getTimestamp("workoutEndTime");
+                        reservations.add(res);
+                    }
+                }
+            }
+            
+            return reservations;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            DatabaseAccessor.getLock().unlock();
+        }
+    }
+
+    /**
      * Get time remaining in seconds for claim window or active workout
      * 
      * @param userId User's ID
@@ -445,5 +501,21 @@ public class ReservationService {
         } finally {
             DatabaseAccessor.getLock().unlock();
         }
+    }
+
+    /**
+     * Helper class to represent a reservation with machine name for API responses
+     */
+    public static class ReservationWithMachine {
+        public int reservationId;
+        public int userId;
+        public int machineId;
+        public String machineName;
+        public Timestamp createdAt;
+        public Timestamp expiresAt;
+        public ReservationStatus status;
+        public int intendedDuration;
+        public Timestamp workoutStartTime;
+        public Timestamp workoutEndTime;
     }
 }

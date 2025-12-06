@@ -28,6 +28,72 @@ public class WaitlistServlet extends HttpServlet {
         }
     }
 
+    // Handle GET requests - Get user's active waitlists
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        String userIdParam = req.getParameter("userID");
+        if (userIdParam == null || userIdParam.isEmpty()) {
+            // Return empty array instead of error response for consistency
+            resp.getWriter().write(gson.toJson(new ArrayList<WaitlistEntry>()));
+            return;
+        }
+
+        try {
+            int userID = Integer.parseInt(userIdParam);
+            List<WaitlistEntry> waitlists = getUserWaitlists(userID);
+            resp.getWriter().write(gson.toJson(waitlists));
+        } catch (NumberFormatException e) {
+            // Return empty array on invalid format
+            resp.getWriter().write(gson.toJson(new ArrayList<WaitlistEntry>()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Return empty array on database error
+            resp.getWriter().write(gson.toJson(new ArrayList<WaitlistEntry>()));
+        }
+    }
+
+    // Get all waitlist entries for a user
+    private List<WaitlistEntry> getUserWaitlists(int userID) throws SQLException {
+        DatabaseAccessor.getLock().lock();
+        try {
+            Connection conn = DatabaseAccessor.GetDatabaseConnection();
+            
+            String waitlistQuery = "SELECT machineID FROM waitlist WHERE userID = ?";
+            List<WaitlistEntry> entries = new ArrayList<>();
+            
+            try (PreparedStatement waitlistPs = conn.prepareStatement(waitlistQuery)) {
+                waitlistPs.setInt(1, userID);
+                try (ResultSet waitlistRs = waitlistPs.executeQuery()) {
+                    while (waitlistRs.next()) {
+                        String machineName = waitlistRs.getString("machineID");
+                        
+                        String machineQuery = "SELECT machineId, name FROM Machines WHERE name = ?";
+                        try (PreparedStatement machinePs = conn.prepareStatement(machineQuery)) {
+                            machinePs.setString(1, machineName);
+                            try (ResultSet machineRs = machinePs.executeQuery()) {
+                                if (machineRs.next()) {
+                                    WaitlistEntry entry = new WaitlistEntry();
+                                    entry.machineId = machineRs.getInt("machineId");
+                                    entry.machineName = machineRs.getString("name");
+                                    entries.add(entry);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return entries;
+        } finally {
+            DatabaseAccessor.getLock().unlock();
+        }
+    }
+
     // Handle POST requests
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -38,7 +104,7 @@ public class WaitlistServlet extends HttpServlet {
 
         String path = req.getPathInfo();
         String body = req.getReader().lines().reduce("", (a, b) -> a + b);
-        Map<String, String> data = gson.fromJson(body, Map.class);
+        Map<String, Object> data = gson.fromJson(body, Map.class);
 
         try {
             if (path == null) {
@@ -67,15 +133,17 @@ public class WaitlistServlet extends HttpServlet {
     }
 
     // JOIN waitlist
-    private void handleJoin(HttpServletResponse resp, Map<String, String> data)
+    private void handleJoin(HttpServletResponse resp, Map<String, Object> data)
             throws SQLException, IOException {
 
-        int userID = Integer.parseInt(data.get("userID"));
-        String machineID = data.get("machineID");
+        int userID = getIntValue(data, "userID");
 
         DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
+            
+            String machineID = getMachineName(data, "machineID", conn);
+
             PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO waitlist (userID, machineID, notified) VALUES (?, ?, 0)"
             );
@@ -90,15 +158,15 @@ public class WaitlistServlet extends HttpServlet {
     }
 
     // CLAIM reservation
-    private void handleClaim(HttpServletResponse resp, Map<String, String> data)
+    private void handleClaim(HttpServletResponse resp, Map<String, Object> data)
             throws SQLException, IOException {
 
-        int userID = Integer.parseInt(data.get("userID"));
-        String machineID = data.get("machineID");
-
+        int userID = getIntValue(data, "userID");
+        
         DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
+            String machineID = getMachineName(data, "machineID", conn);
 
             PreparedStatement del = conn.prepareStatement(
                 "DELETE FROM waitlist WHERE userID = ? AND machineID = ? LIMIT 1"
@@ -114,16 +182,15 @@ public class WaitlistServlet extends HttpServlet {
     }
 
     // DECLINE -> notify next user
-    private void handleDecline(HttpServletResponse resp, Map<String, String> data)
+    private void handleDecline(HttpServletResponse resp, Map<String, Object> data)
             throws SQLException, IOException {
 
-        int userID = Integer.parseInt(data.get("userID"));
-        String machineID = data.get("machineID");
-
+        int userID = getIntValue(data, "userID");
+        
         DatabaseAccessor.getLock().lock();
-
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
+            String machineID = getMachineName(data, "machineID", conn);
 
             // Remove declining user
             PreparedStatement del = conn.prepareStatement(
@@ -167,6 +234,64 @@ public class WaitlistServlet extends HttpServlet {
         } finally {
             DatabaseAccessor.getLock().unlock();
         }
+    }
+
+    // Helper methods to safely extract values from Map<String, Object>
+    private int getIntValue(Map<String, Object> data, String key) {
+        Object value = data.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required parameter: " + key);
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        if (value instanceof String) {
+            return Integer.parseInt((String) value);
+        }
+        throw new IllegalArgumentException("Invalid type for " + key + ": expected number or string");
+    }
+
+    private String getStringValue(Map<String, Object> data, String key) {
+        Object value = data.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required parameter: " + key);
+        }
+        return value.toString();
+    }
+
+    // Get machine name from machineID (handles both integer machineId and string machine name)
+    private String getMachineName(Map<String, Object> data, String key, Connection conn) throws SQLException {
+        Object value = data.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required parameter: " + key);
+        }
+        
+        if (value instanceof String) {
+            return (String) value;
+        }
+        
+        if (value instanceof Number) {
+            int machineId = ((Number) value).intValue();
+            String query = "SELECT name FROM Machines WHERE machineId = ?";
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setInt(1, machineId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("name");
+                    } else {
+                        throw new IllegalArgumentException("Machine not found: " + machineId);
+                    }
+                }
+            }
+        }
+        
+        return value.toString();
+    }
+
+    // Response class for waitlist entries
+    class WaitlistEntry {
+        int machineId;
+        String machineName;
     }
 
     // Send JSON response
