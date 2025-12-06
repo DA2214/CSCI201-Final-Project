@@ -55,7 +55,7 @@ public class DatabaseAccessor {
 
             getUserFromUsernameStatement = connection.prepareStatement("SELECT * FROM users WHERE username = ?");
             getUserFromEmailStatement = connection.prepareStatement("SELECT * FROM users WHERE email = ?");
-            insertUserStatement = connection.prepareStatement("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+            insertUserStatement = connection.prepareStatement("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException("Could not load MySQL JDBC driver: " + e.getMessage());
@@ -118,7 +118,8 @@ public class DatabaseAccessor {
             insertUserStatement.executeUpdate();
             try (ResultSet resultSet = insertUserStatement.getGeneratedKeys()) {
                 if (resultSet.next()) {
-                    return resultSet.getInt("uid");
+                    // Generated keys ResultSet has a single column at index 1, not a named column
+                    return resultSet.getInt(1);
                 }
             }
         } catch (SQLException e) {
