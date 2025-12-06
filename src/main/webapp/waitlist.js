@@ -6,8 +6,12 @@ console.log("Guest mode:", isGuest);
 
 /* backend variables */
 let machines = [];
-let myWaitlistMachineIds = [];   
-const userID = localStorage.getItem("userID");
+let myWaitlistMachineIds = [];
+let myWaitlists = []; // Store full waitlist data including machine names
+// Get userID dynamically instead of as const to handle login after page load
+function getUserID() {
+    return localStorage.getItem("userId") || sessionStorage.getItem("userId");
+}
 
 /* utility funcs*/
 function computeEstimatedWait(count) {
@@ -26,18 +30,51 @@ async function loadMachines() {
     try {
         const response = await fetch("/201Final/machines");
         machines = await response.json();
-        console.log("Loaded machines:", machines);
 
         renderSummary();
         renderTable();
-        renderMyWaitlists();
     } catch (err) {
         console.error("ERROR loading machines:", err);
     }
 }
 
+async function loadMyWaitlists() {
+    const userID = getUserID();
+    if (isGuest || !userID) {
+        myWaitlistMachineIds = [];
+        myWaitlists = [];
+        renderMyWaitlists();
+        return;
+    }
+
+    try {
+        const response = await fetch(`/201Final/WaitlistServlet?userID=${userID}`);
+        if (!response.ok) {
+            throw new Error("Failed to load waitlists");
+        }
+        const waitlists = await response.json();
+        
+        if (waitlists && waitlists.success === false) {
+            myWaitlistMachineIds = [];
+            renderMyWaitlists();
+            return;
+        }
+        
+        myWaitlists = Array.isArray(waitlists) ? waitlists : [];
+        myWaitlistMachineIds = myWaitlists.map(w => w.machineId).filter(id => id != null);
+        
+        renderMyWaitlists();
+        renderSummary();
+    } catch (err) {
+        console.error("ERROR loading waitlists:", err);
+        myWaitlistMachineIds = [];
+        renderMyWaitlists();
+    }
+}
+
 async function joinWaitlist(machineId) {
     if (isGuest) return alert("Please log in to join waitlists.");
+    const userID = getUserID();
     if (!userID) return alert("Missing userID — please log in again.");
 
     const body = { userID, machineID: machineId };
@@ -50,10 +87,12 @@ async function joinWaitlist(machineId) {
 
     const data = await res.json();
     alert(data.message);
-    loadMachines();
+    await loadMachines();
+    await loadMyWaitlists();
 }
 
 async function leaveWaitlist(machineId) {
+    const userID = getUserID();
     if (!userID) return;
 
     const body = { userID, machineID: machineId };
@@ -66,7 +105,8 @@ async function leaveWaitlist(machineId) {
 
     const data = await res.json();
     alert(data.message);
-    loadMachines();
+    await loadMachines(); // Wait for machines to load first
+    await loadMyWaitlists(); // Then refresh my waitlists after leaving
 }
 
 /* rendering - summary chips*/
@@ -76,8 +116,10 @@ function renderSummary() {
         machines.filter(m => m.status !== "AVAILABLE").length;
 
     if (!isGuest) {
-        document.getElementById("summaryMyWaitlists").textContent =
-            myWaitlistMachineIds.length;
+        const summaryEl = document.getElementById("summaryMyWaitlists");
+        if (summaryEl) {
+            summaryEl.textContent = myWaitlistMachineIds.length;
+        }
     }
 }
 
@@ -86,21 +128,34 @@ function renderMyWaitlists() {
     if (isGuest) return;
 
     const listEl = document.getElementById("myWaitlistsList");
+    if (!listEl) return;
     listEl.innerHTML = "";
 
     if (myWaitlistMachineIds.length === 0) {
         listEl.innerHTML = "<li>You are not on any waitlists.</li>";
         return;
     }
-
     myWaitlistMachineIds.forEach(id => {
-        const machine = machines.find(m => m.machineId === id);
-        if (!machine) return;
-
+        // Find waitlist entry with machine name from backend
+        const waitlistEntry = myWaitlists.find(w => w.machineId === id);
+        let machineName = null;
+        
+        if (waitlistEntry && waitlistEntry.machineName) {
+            // Use machine name from backend response
+            machineName = waitlistEntry.machineName;
+        } else {
+            // Fallback: try to find in machines array
+            const machineIdNum = typeof id === 'string' ? parseInt(id, 10) : id;
+            const machine = machines.find(m => Number(m.machineId) === machineIdNum);
+            machineName = machine ? machine.name : null;
+        }
+        
         const li = document.createElement("li");
+        const displayName = machineName || `Machine ${id}`;
         li.innerHTML = `
-            <span>${machine.name} — <span class="status-waitlist">Waitlist</span></span>
+            <span>${displayName} — <span class="status-waitlist">Waitlist</span></span>
         `;
+        
         const btn = document.createElement("button");
         btn.textContent = "Leave Waitlist";
         btn.classList.add("btn-join", "btn-join-secondary");
@@ -197,5 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("filterType").addEventListener("change", renderTable);
 
-    loadMachines();
+    // Load machines first, then waitlists (so waitlists can find machine names)
+    loadMachines().then(() => loadMyWaitlists());
 });
