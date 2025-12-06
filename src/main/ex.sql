@@ -6,13 +6,6 @@ VALUES ('nelsonvo', 'nqvo@usc.edu', 'password123');
 
 -- Machine data comes from machine_seed_data.sql (not here)
 
--- Insert past machine usage for analytics
-INSERT INTO machineusage (userID, machineID, duration, date) VALUES
-(1, 'Treadmill #1', 45, '2025-01-20'),
-(1, 'Treadmill #2', 90, '2025-01-22'),
-(1, 'Treadmill #1', 120, '2025-01-25'),
-(1, 'Bench Press #1', 60, '2025-02-01');
-
 -- Insert past workout history for analytics
 INSERT INTO workout_history (userID, machineID, startTime, endTime, status, date) VALUES
 (1, 'Treadmill #1', '10:00:00', '11:00:00', 'Completed', '2025-01-22'),
