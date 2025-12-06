@@ -16,14 +16,6 @@ import com.google.gson.GsonBuilder;
 public class AnalyticsServlet extends HttpServlet {
 
     // ---------- POJO CLASSES ----------
-    class MachineUsageRecord {
-        int usageID;
-        int duration;
-        String date;
-        String machineID;
-        String machineName;
-    }
-
     class ReservationRecord {
         int reservationId;
         String startTime;
@@ -35,7 +27,6 @@ public class AnalyticsServlet extends HttpServlet {
     }
 
     class UserHistoryResponse {
-        List<MachineUsageRecord> machineUsage;
         List<ReservationRecord> reservations;
     }
     // -----------------------------------
@@ -57,38 +48,12 @@ public class AnalyticsServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
 
         UserHistoryResponse responseObj = new UserHistoryResponse();
-        responseObj.machineUsage = new ArrayList<>();
         responseObj.reservations = new ArrayList<>();
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             try (Connection conn = DatabaseAccessor.GetDatabaseConnection()) {
-
-                // -----------------------------
-                // MACHINE USAGE QUERY
-                // -----------------------------
-                // Updated to use new Machines table
-                String usageQuery =
-                        "SELECT mu.usageID, mu.duration, mu.date, " +
-                        "       CAST(m.machineId AS CHAR) AS machineID, m.name AS machineName " +
-                        "FROM machineusage mu " +
-                        "JOIN Machines m ON mu.machineID = m.name " +
-                        "WHERE mu.userID = ?";
-
-                PreparedStatement usageStmt = conn.prepareStatement(usageQuery);
-                usageStmt.setInt(1, userID);
-                ResultSet usageRs = usageStmt.executeQuery();
-
-                while (usageRs.next()) {
-                    MachineUsageRecord record = new MachineUsageRecord();
-                    record.usageID = usageRs.getInt("usageID");
-                    record.duration = usageRs.getInt("duration");
-                    record.date = usageRs.getString("date");
-                    record.machineID = usageRs.getString("machineID");
-                    record.machineName = usageRs.getString("machineName");
-                    responseObj.machineUsage.add(record);
-                }
 
                 // -----------------------------
                 // WORKOUT HISTORY QUERY

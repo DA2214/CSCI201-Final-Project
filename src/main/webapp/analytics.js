@@ -2,7 +2,6 @@
 // Fetch data from server
 // ======================
 
-// You must set this from login/session
 const LOGGED_IN_USER_ID = localStorage.getItem("userId");
 
 async function fetchUserHistory() {
@@ -14,28 +13,29 @@ async function fetchUserHistory() {
     }
 
     const data = await response.json();
+    console.log("Fetched data:", data);
 
-	console.log(data);
-	
-    // Expecting: { machineUsage: [...], reservations: [...] }
-    return {
-      usage: data.machineUsage || [],
-      reservations: data.reservations || []
-    };
+    // Only use reservations now
+    return data.reservations || [];
 
   } catch (err) {
     console.error("Error fetching user history:", err);
-    return { usage: [], reservations: [] };
+    return [];
   }
 }
 
 // ======================
-// Date helpers
+// Date & Time Helpers
 // ======================
 
 function parseDate(dateStr) {
   const [y, m, d] = dateStr.split("-").map(Number);
   return new Date(y, m - 1, d);
+}
+
+function timeToMinutes(t) {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
 }
 
 function filterByRange(data, days) {
@@ -48,7 +48,11 @@ function filterByRange(data, days) {
   return data.filter((item) => parseDate(item.date) >= cutoff);
 }
 
-function computeTotals(usageData) {
+// ======================
+// Summary Calculations (Reservations Only)
+// ======================
+
+function computeTotals(reservations) {
   const now = new Date();
   const weekCutoff = new Date(now);
   weekCutoff.setDate(now.getDate() - 7);
@@ -59,21 +63,27 @@ function computeTotals(usageData) {
   let weekly = 0;
   let monthly = 0;
 
-  usageData.forEach((u) => {
-    const d = parseDate(u.date);
-    if (d >= weekCutoff) weekly += u.duration;
-    if (d >= monthCutoff) monthly += u.duration;
+  reservations.forEach((r) => {
+    const d = parseDate(r.date);
+    if (isNaN(d)) return;
+
+    const duration = timeToMinutes(r.endTime) - timeToMinutes(r.startTime);
+
+    if (d >= weekCutoff) weekly += duration;
+    if (d >= monthCutoff) monthly += duration;
   });
 
   return { weekly, monthly };
 }
 
-function computeTopMachine(usageData) {
-  if (!usageData.length) return "–";
+function computeTopMachine(reservations) {
+  if (!reservations.length) return "–";
+
   const totals = {};
 
-  usageData.forEach((u) => {
-    totals[u.machineName] = (totals[u.machineName] || 0) + u.duration;
+  reservations.forEach((r) => {
+    const duration = timeToMinutes(r.endTime) - timeToMinutes(r.startTime);
+    totals[r.machineName] = (totals[r.machineName] || 0) + duration;
   });
 
   let bestName = "–";
@@ -89,63 +99,36 @@ function computeTopMachine(usageData) {
   return bestName;
 }
 
-// ======================
-// Rendering functions
-// ======================
+function renderSummary(reservations) {
+  const { weekly, monthly } = computeTotals(reservations);
 
-function renderSummary(usageData) {
-  const { weekly, monthly } = computeTotals(usageData);
   document.getElementById("weeklyMinutes").textContent = `${weekly} min`;
   document.getElementById("monthlyMinutes").textContent = `${monthly} min`;
-  document.getElementById("topMachine").textContent = computeTopMachine(usageData);
+  document.getElementById("topMachine").textContent = computeTopMachine(reservations);
 }
 
-function renderUsageTable(usageData) {
-  const tbody = document.querySelector("#usageTable tbody");
-  const emptyMsg = document.getElementById("usageEmpty");
-  tbody.innerHTML = "";
+// ======================
+// Table Rendering (Reservations Only)
+// ======================
 
-  if (usageData.length === 0) {
-    emptyMsg.style.display = "block";
-    return;
-  }
-
-  emptyMsg.style.display = "none";
-
-  const sorted = usageData
-    .slice()
-    .sort((a, b) => parseDate(b.date) - parseDate(a.date));
-
-  sorted.forEach((u) => {
-	console.log(u);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${u.date}</td>
-      <td>${u.machineName}</td>
-      <td>${u.duration} min</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function renderReservationTable(reservationData) {
+function renderReservationTable(reservations) {
   const tbody = document.querySelector("#reservationTable tbody");
   const emptyMsg = document.getElementById("reservationEmpty");
+
   tbody.innerHTML = "";
 
-  if (reservationData.length === 0) {
+  if (!reservations.length) {
     emptyMsg.style.display = "block";
     return;
   }
 
   emptyMsg.style.display = "none";
 
-  const sorted = reservationData
+  const sorted = reservations
     .slice()
     .sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
   sorted.forEach((r) => {
-	console.log(r);
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.date}</td>
@@ -159,43 +142,32 @@ function renderReservationTable(reservationData) {
 }
 
 // ======================
-// Update UI based on dropdown
+// Update UI on dropdown
 // ======================
 
-let serverUsage = [];
 let serverReservations = [];
 
 function updateView() {
   const days = document.getElementById("timeRange").value;
+  const filtered = filterByRange(serverReservations, days);
 
-  console.log(days);
-  console.log(serverUsage);
-  const filteredUsage = filterByRange(serverUsage, days);
-  console.log(serverReservations);
-  const filteredReservations = filterByRange(serverReservations, days);
+  // Summary uses ALL reservations
+  renderSummary(serverReservations);
 
-  console.log
-  renderSummary(serverUsage); // summary always uses full usage
-  renderUsageTable(filteredUsage);
-  renderReservationTable(filteredReservations);
+  // Table uses filtered range
+  renderReservationTable(filtered);
 }
 
 // ======================
 // Buttons & Initialization
 // ======================
 
-function handleLogout() {
-  window.location.href = "login.html";
-}
-
 document.addEventListener("DOMContentLoaded", async () => {
-	console.log("Doing JS");
-  document.getElementById("timeRange").addEventListener("change", updateView);
-  document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+  console.log("Dashboard JS Loaded!");
 
-  // 🌟 Fetch real data from your servlet
-  const data = await fetchUserHistory();
-  serverUsage = data.usage;
-  serverReservations = data.reservations;
+  document.getElementById("timeRange").addEventListener("change", updateView);
+
+  // Fetch data & render UI
+  serverReservations = await fetchUserHistory();
   updateView();
 });
