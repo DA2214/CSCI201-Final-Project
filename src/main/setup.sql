@@ -1,7 +1,7 @@
 -- Create the database
 DROP DATABASE IF EXISTS GymSync;
 CREATE DATABASE GymSync;
-USE GymSybc;
+USE GymSync;
 
 --------------------------------------------------
 -- 1. USERS TABLE

@@ -5,7 +5,8 @@ public class Notification {
     private String createdAt;
     private int readStatus;
 
-    public Notification(int notifyID, int userID, String message, String createdAt, int readStatus) {
+    public Notification(int notifyID, int userID, String message,
+                        String createdAt, int readStatus) {
         this.notifyID = notifyID;
         this.userID = userID;
         this.message = message;
@@ -18,6 +19,5 @@ public class Notification {
     public String getMessage() { return message; }
     public String getCreatedAt() { return createdAt; }
     public int getReadStatus() { return readStatus; }
-
     public void setReadStatus(int readStatus) { this.readStatus = readStatus; }
 }

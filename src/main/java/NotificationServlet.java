@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 @WebServlet("/notifications")
 public class NotificationServlet extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -22,7 +23,6 @@ public class NotificationServlet extends HttpServlet {
         }
 
         String username = (String) session.getAttribute("username");
-
         ArrayList<Notification> notes = NotificationDAO.getNotifications(username);
 
         Gson gson = new Gson();

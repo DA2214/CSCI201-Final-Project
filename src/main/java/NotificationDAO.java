@@ -3,43 +3,28 @@ import java.util.ArrayList;
 
 public class NotificationDAO {
 
-    // Helper: convert username → userID
+    // helper: username -> uid
     private static Integer getUserIDFromUsername(String username) {
         String sql = "SELECT uid FROM users WHERE username = ?";
 
-        DatabaseAccessor.getLock().lock();;
+        try (Connection conn = DatabaseAccessor.GetDatabaseConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-
-        try {
-            Connection conn = DatabaseAccessor.GetDatabaseConnection();
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, username);
-                ResultSet rs = stmt.executeQuery();
-
-                if (rs.next()) {
-                    return rs.getInt("uid");
-                }
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("uid");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            DatabaseAccessor.getLock().unlock();
         }
-        return null; // username not found
+        return null; // not found
     }
 
-    // Create a new notification for a username
-    public static void createNotification(String username, String message) {
-        Integer userID = getUserIDFromUsername(username);
-
-        if (userID == null) {
-            System.out.println("NotificationDAO: username not found: " + username);
-            return;
-        }
-
+    // create a notification for a given username
+    public static void createNotification(int userID, String message) {
         String sql = "INSERT INTO notifications (userID, message) VALUES (?, ?)";
 
-        DatabaseAccessor.getLock().lock();
         try {
             Connection conn = DatabaseAccessor.GetDatabaseConnection();
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -49,61 +34,54 @@ public class NotificationDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            DatabaseAccessor.getLock().unlock();
         }
     }
 
-    // Get notifications for a username
+
+    // fetch all notifications for a username, newest first
     public static ArrayList<Notification> getNotifications(String username) {
         ArrayList<Notification> list = new ArrayList<>();
-        
+
         Integer userID = getUserIDFromUsername(username);
-        if (userID == null) { return list; }
+        if (userID == null) return list;
 
         String sql = "SELECT * FROM notifications WHERE userID = ? ORDER BY createdAt DESC";
 
-        DatabaseAccessor.getLock().lock();
-        try {
-            Connection conn = DatabaseAccessor.GetDatabaseConnection();
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, userID);
-                ResultSet rs = stmt.executeQuery();
+        try (Connection conn = DatabaseAccessor.GetDatabaseConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                while (rs.next()) {
-                    list.add(new Notification(
-                            rs.getInt("notifyID"),
-                            rs.getInt("userID"),
-                            rs.getString("message"),
-                            rs.getString("createdAt"),
-                            rs.getInt("readStatus")
-                    ));
-                }
+            stmt.setInt(1, userID);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                list.add(new Notification(
+                    rs.getInt("notifyID"),
+                    rs.getInt("userID"),
+                    rs.getString("message"),
+                    rs.getString("createdAt"),
+                    rs.getInt("readStatus")
+                ));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            DatabaseAccessor.getLock().unlock();
         }
 
         return list;
     }
 
-    // Mark a notification as read
+    // mark one notification as read
     public static void markAsRead(int notifyID) {
         String sql = "UPDATE notifications SET readStatus = 1 WHERE notifyID = ?";
 
-        DatabaseAccessor.getLock().lock();
-        try {
-            Connection conn = DatabaseAccessor.GetDatabaseConnection();
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, notifyID);
-                stmt.executeUpdate();
-            }
+        try (Connection conn = DatabaseAccessor.GetDatabaseConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, notifyID);
+            stmt.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            DatabaseAccessor.getLock().unlock();
         }
     }
 }

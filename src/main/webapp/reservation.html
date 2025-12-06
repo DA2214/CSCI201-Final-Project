@@ -14,6 +14,18 @@
 	          <a href="waitlist.html">Availability</a>
         <a href="reservation.html" class="active">Reservations</a>
         <a href="analytics.html" class="nav-auth-only">My Analytics</a>
+        
+        <!-- 🔔 NOTIFICATION BELL ADDED HERE -->
+      <div id="notification-bell" onclick="toggleDropdown()">
+        🔔 <span id="notification-count">0</span>
+      </div>
+
+      <div id="notification-dropdown" style="display:none;">
+        <h3>Notifications</h3>
+        <div id="notification-list"></div>
+      </div>
+      <!-- 🔔 END NOTIFICATION UI -->
+        
 	    <button type="button" class="nav-auth-btn" onclick="window.location.href='login.html'">
 	      Logout
 	    </button>
@@ -81,5 +93,6 @@
   </footer>
 
   <script src="reservation.js"></script>
+  <script src="notifications.js"></script>
 </body>
 </html>

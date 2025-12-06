@@ -1,13 +1,19 @@
+function toggleDropdown() {
+    const box = document.getElementById("notification-dropdown");
+    box.style.display = (box.style.display === "none") ? "block" : "none";
+}
+
 async function fetchNotifications() {
     try {
-        const res = await fetch("/notifications");
+        const res = await fetch("notifications"); // calls NotificationServlet
         const notifications = await res.json();
 
         const countElem = document.getElementById("notification-count");
         const listElem = document.getElementById("notification-list");
 
-        listElem.innerHTML = "";
+        if (!countElem || !listElem) return;
 
+        listElem.innerHTML = "";
         let unread = 0;
 
         notifications.forEach(n => {
@@ -15,7 +21,6 @@ async function fetchNotifications() {
 
             const item = document.createElement("div");
             item.className = "notification-item";
-
             item.innerHTML = `
                 <p>${n.message}</p>
                 <small>${n.createdAt}</small>
@@ -23,30 +28,25 @@ async function fetchNotifications() {
                     Mark as read
                 </button>
             `;
-
             listElem.appendChild(item);
         });
 
-        // update bell counter
         countElem.textContent = unread > 9 ? "9+" : unread;
 
     } catch (err) {
-        console.error("Notification fetch failed:", err);
+        console.error("Error fetching notifications:", err);
     }
 }
 
 async function markRead(id) {
-    await fetch("/markNotificationRead", {
+    await fetch("markNotificationRead", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "notifyID=" + id
+        body: "notifyID=" + encodeURIComponent(id)
     });
 
-    fetchNotifications(); // refresh after marking read
+    fetchNotifications();
 }
 
-// refresh every 5 seconds
-setInterval(fetchNotifications, 5000);
-
-// initial load
-window.onload = fetchNotifications;
+setInterval(fetchNotifications, 5000); // auto-refresh every 5 sec
+window.addEventListener("load", fetchNotifications);
