@@ -1,7 +1,7 @@
 -- Create the database
-DROP DATABASE IF EXISTS TrojanTracker;
-CREATE DATABASE TrojanTracker;
-USE TrojanTracker;
+DROP DATABASE IF EXISTS GymSync;
+CREATE DATABASE GymSync;
+USE GymSybc;
 
 --------------------------------------------------
 -- 1. USERS TABLE
@@ -23,20 +23,6 @@ CREATE TABLE Machines (
     status ENUM('AVAILABLE', 'RESERVED', 'IN_USE') NOT NULL DEFAULT 'AVAILABLE',
     INDEX idx_status (status),
     INDEX idx_type (type)
-);
-
---------------------------------------------------
--- 3. MACHINE USAGE TABLE
---------------------------------------------------
-CREATE TABLE machineusage (
-    usageID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT NOT NULL,
-    machineID VARCHAR(50) NOT NULL,  -- Stores machine name, JOINs with Machines.name
-    duration INT NOT NULL,
-    date DATE NOT NULL,
-
-    FOREIGN KEY (userID) REFERENCES users(uid)
-    -- Updated to use new Machines table: foreign key removed, JOIN uses Machines.name
 );
 
 --------------------------------------------------
@@ -65,7 +51,6 @@ CREATE TABLE waitlist (
     machineID VARCHAR(50) NOT NULL,  -- Stores machine name, references Machines.name
     requestTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     notified TINYINT(1) DEFAULT 0,
-
     FOREIGN KEY (userID) REFERENCES users(uid)
     -- Updated to use new Machines table: foreign key removed, uses machine names
 );

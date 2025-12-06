@@ -3,7 +3,7 @@
 // ======================
 
 // You must set this from login/session
-const LOGGED_IN_USER_ID = 101;
+const LOGGED_IN_USER_ID = localStorage.getItem("userId");
 
 async function fetchUserHistory() {
   try {

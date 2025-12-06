@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseAccessor {
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/TrojanTracker";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/GymSync";
     private static final String JDBC_USER = "root";
     private static final String JDBC_PASS = "root";
 
