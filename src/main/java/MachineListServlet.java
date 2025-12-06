@@ -31,7 +31,7 @@ public class MachineListServlet extends HttpServlet {
      *   {
      *     "machineId": 1,
      *     "name": "Treadmill #1",
-     *     "type": "cardio",
+     *     "type": "Cardio",
      *     "status": "AVAILABLE"
      *   },
      *   ...
