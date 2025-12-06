@@ -37,7 +37,7 @@ public class AccountRegistrationServlet extends HttpServlet {
         DatabaseAccessor.getLock().lock();
         try {
             if (!DatabaseAccessor.CheckEmailExists(email) && !DatabaseAccessor.CheckUserExists(username)) {
-                int userID = DatabaseAccessor.RegisterUser(username, email, password);
+                int userID = DatabaseAccessor.RegisterUser(username, password, email);
 
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                 resp.setContentType("application/json");
