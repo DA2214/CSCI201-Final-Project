@@ -122,6 +122,7 @@ body {
 
 
 
+
 /* ============================
    Notifications (Nav Bar Version)
    ============================ */
@@ -146,47 +147,66 @@ body {
   font-weight: bold;
 }
 
+/* RESET all inherited colors & create a clean independent container */
 #notification-dropdown {
   position: absolute;
-  top: 45px; /* direct dropdown under bell */
-  right: 0;
+  top: 55px; /* push down slightly below nav */
+  right: 10px;
   width: 300px;
   max-height: 350px;
-  background: #fff;
+  
+  background: #ffffff;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 1rem;
   overflow-y: auto;
   display: none;
   z-index: 9999;
+
+  /* This BLOCKS any inherited white color from <nav> */
+  color-scheme: light;
+  color: #000 !important;
+  isolation: isolate;      /* <-- This is the secret fix */
 }
 
 #notification-dropdown h3 {
   margin: 0 0 10px 0;
-  color: var(--usc-red);
+  color: var(--usc-red) !important;
 }
 
+/* Notification card */
 .notification-item {
   padding: 10px;
   border-bottom: 1px solid #eee;
+  background: #fff !important;
+  color: #000 !important;
 }
 
 .notification-item:last-child {
   border-bottom: none;
 }
 
+/* Message text */
+.notification-item p {
+  color: #000 !important;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Timestamp */
 .notification-item small {
   display: block;
-  color: #777;
+  color: #555 !important;
   font-size: 0.8rem;
   margin-top: 3px;
 }
 
+/* Button */
 .notification-mark-btn {
   margin-top: 6px;
   font-size: 0.75rem;
   background: var(--usc-red);
-  color: white;
+  color: white !important;
   padding: 4px 8px;
   border-radius: var(--radius);
   border: none;

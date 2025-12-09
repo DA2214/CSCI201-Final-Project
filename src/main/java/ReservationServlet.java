@@ -163,6 +163,13 @@ public class ReservationServlet extends HttpServlet {
         int reservationId = ReservationService.createReservation(userId, machineId, duration);
 
         if (reservationId > 0) {
+        	
+        	// Create reservation notification
+            NotificationDAO.createNotification(
+                userId,
+                "Your reservation for machine " + machineId + " is confirmed. You have 5 minutes to start your workout."
+            );
+        	
             // Get reservation details
             long claimTimeRemaining = ReservationService.getClaimTimeRemaining(userId, machineId);
             Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + (claimTimeRemaining * 1000));
@@ -192,6 +199,13 @@ public class ReservationServlet extends HttpServlet {
         boolean success = ReservationService.startMachine(userId, machineId);
 
         if (success) {
+        	
+        	// Create workout-start notification
+            NotificationDAO.createNotification(
+                userId,
+                "Your workout on machine " + machineId + " has started."
+            );
+        	
             SimpleResponse response = new SimpleResponse(true, "Machine started successfully");
             resp.getWriter().write(gson.toJson(response));
         } else {
@@ -209,6 +223,12 @@ public class ReservationServlet extends HttpServlet {
         boolean success = ReservationService.cancelReservation(userId, machineId);
 
         if (success) {
+        	
+        	NotificationDAO.createNotification(
+        		    userId,
+        		    "Your reservation for machine " + machineId + " has been cancelled."
+        		);
+        	
             SimpleResponse response = new SimpleResponse(true, "Reservation cancelled successfully");
             resp.getWriter().write(gson.toJson(response));
         } else {

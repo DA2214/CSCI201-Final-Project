@@ -20,7 +20,9 @@ async function loginUser() {
         if (resp.status === 202) {
             let data = await resp.json();
             localStorage.setItem("userId", data.userId);
-            window.location.href = "waitlist.html";
+			setTimeout(() => {
+				window.location.href = "waitlist.html";
+			}, 150);  // <-- give session cookie time to register
         } 
         else if (resp.status === 404) {
             err.textContent = "Incorrect username or password.";

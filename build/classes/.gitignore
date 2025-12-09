@@ -8,3 +8,6 @@
 /NotificationDAO.class
 /NotificationServlet.class
 /NotificationReadServlet.class
+/ReservationService$ReservationWithMachine.class
+/WaitlistServlet$WaitlistEntry.class
+/testing_code/

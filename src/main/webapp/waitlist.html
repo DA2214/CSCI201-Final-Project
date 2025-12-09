@@ -16,6 +16,12 @@
         <a href="waitlist.html" class="active">Availability</a>
         <a href="reservation.html" class="nav-auth-only">Reservations</a>
         <a href="analytics.html" class="nav-auth-only">My Analytics</a>
+        
+        <!-- 🔔 Notification Bell -->
+		<div id="notification-bell" class="nav-auth-only" onclick="toggleDropdown()">
+    		🔔 <span id="notification-count">0</span>
+		</div>
+        
 	    <button type="button" class="nav-auth-btn nav-auth-only" onclick="window.location.href='login.html'">
 	      Logout
 	    </button>
@@ -26,6 +32,11 @@
         </a>
     </div>
 </nav>
+
+<div id="notification-dropdown" class="nav-auth-only" style="display:none;">
+    <h3>Notifications</h3>
+    <div id="notification-list"></div>
+</div>
 
     <!-- MAIN CONTENT -->
     <main class="page-content">
@@ -102,7 +113,7 @@
 
     <!-- JS -->
     <script src="waitlist.js"></script>
-      <script src="notifications.js"></script>
+    <script src="notifications.js"></script>
 </body>
 </html>
 

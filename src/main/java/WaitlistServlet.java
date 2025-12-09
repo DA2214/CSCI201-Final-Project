@@ -150,6 +150,12 @@ public class WaitlistServlet extends HttpServlet {
             ps.setInt(1, userID);
             ps.setString(2, machineID);
             ps.executeUpdate();
+            
+         // notify user they joined a waitlist
+            NotificationDAO.createNotification(
+                userID,
+                "You joined the waitlist for machine " + machineID + "."
+            );
 
             send(resp, true, "User added to waitlist.");
         } finally {
@@ -174,6 +180,12 @@ public class WaitlistServlet extends HttpServlet {
             del.setInt(1, userID);
             del.setString(2, machineID);
             del.executeUpdate();
+            
+         // Notification on successful claim
+            NotificationDAO.createNotification(
+                userID,
+                "You have successfully claimed an open spot for machine " + machineID + "."
+            );
 
             send(resp, true, "Slot successfully claimed.");
         } finally {
@@ -215,12 +227,11 @@ public class WaitlistServlet extends HttpServlet {
             int nextUserID = rs.getInt("userID");
 
             // Create notification
-            PreparedStatement notify = conn.prepareStatement(
-                "INSERT INTO notifications (userID, message) VALUES (?, ?)"
+            // Create notification for next user
+            NotificationDAO.createNotification(
+                nextUserID,
+                "A spot has opened on machine " + machineID + "! You may reserve it now."
             );
-            notify.setInt(1, nextUserID);
-            notify.setString(2, "A slot has opened for machine: " + machineID);
-            notify.executeUpdate();
 
             // Mark notified
             PreparedStatement update = conn.prepareStatement(

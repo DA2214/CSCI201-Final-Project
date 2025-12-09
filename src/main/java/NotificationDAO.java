@@ -23,6 +23,8 @@ public class NotificationDAO {
 
     // create a notification for a given username
     public static void createNotification(int userID, String message) {
+        System.out.println("DEBUG: Creating notification for userID=" + userID + ", message=" + message);
+
         String sql = "INSERT INTO notifications (userID, message) VALUES (?, ?)";
 
         try {
@@ -36,6 +38,7 @@ public class NotificationDAO {
             e.printStackTrace();
         }
     }
+
 
 
     // fetch all notifications for a username, newest first

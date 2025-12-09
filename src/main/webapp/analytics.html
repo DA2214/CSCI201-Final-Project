@@ -9,16 +9,29 @@
 <body>
   <!-- Top navigation shared look with reservation page -->
   <nav class="top-nav">
-    <div class="logo">USC Village GymSync</div>
-    <div class="nav-links">
-            <a href="waitlist.html" >Availability</a>
+  <div class="logo">USC Village GymSync</div>
+
+  <div class="nav-links">
+        <a href="waitlist.html">Availability</a>
         <a href="reservation.html">Reservations</a>
         <a href="analytics.html" class="active">My Analytics</a>
-	    <button type="button" class="nav-auth-btn" onclick="window.location.href='login.html'">
-	      Logout
-	    </button>
-    </div>
-  </nav>
+
+        <!-- 🔔 Notification Bell -->
+        <div id="notification-bell" onclick="toggleDropdown()">
+          🔔 <span id="notification-count">0</span>
+        </div>
+
+        <button type="button" class="nav-auth-btn" onclick="window.location.href='login.html'">
+          Logout
+        </button>
+  </div>
+</nav>
+
+<div id="notification-dropdown" style="display:none;">
+    <h3>Notifications</h3>
+	<div id="notification-list"></div>
+</div>
+
 
   <main class="analytics-container">
     <!-- Left column: summary cards -->
@@ -77,6 +90,7 @@
   </main>
 
   <script src="analytics.js"></script>
+  <script src="notifications.js"></script>
     <footer>
     © 2025 USC GymSync | Team 17 · CSCI-201 · Marco Papa
   </footer>

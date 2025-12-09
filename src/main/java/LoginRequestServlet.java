@@ -33,6 +33,16 @@ public class LoginRequestServlet extends HttpServlet {
         try {
             int userId = DatabaseAccessor.LoginUser(username, password);
             if (userId != -1) {
+            	
+            	// ADDED: Create session
+                HttpSession session = req.getSession(true);
+
+                // ADDED: Store username for NotificationServlet
+                session.setAttribute("username", username);
+
+                // ADDED: Store userId for reservation actions
+                session.setAttribute("userId", userId);
+            	
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                 resp.setContentType("application/json");
 
